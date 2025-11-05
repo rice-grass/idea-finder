@@ -1,10 +1,27 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import githubRoutes from './routes/github.js';
 import ideaRoutes from './routes/idea.js';
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Load .env from project root
+const envPath = join(__dirname, '../../.env');
+console.log('Loading .env from:', envPath);
+const result = dotenv.config({ path: envPath });
+
+if (result.error) {
+  console.error('Error loading .env file:', result.error);
+} else {
+  console.log('✓ .env file loaded successfully');
+}
+
+console.log('OPENAI_API_KEY exists:', !!process.env.OPENAI_API_KEY);
+console.log('OPENAI_API_KEY length:', process.env.OPENAI_API_KEY?.length);
 
 const app = express();
 const PORT = process.env.PORT || 3000;

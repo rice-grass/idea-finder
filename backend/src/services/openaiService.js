@@ -2,9 +2,19 @@ import OpenAI from 'openai';
 
 class OpenAIService {
   constructor() {
-    this.openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY
-    });
+    this._openai = null;
+  }
+
+  get openai() {
+    if (!this._openai) {
+      if (!process.env.OPENAI_API_KEY) {
+        throw new Error('OPENAI_API_KEY is not set in environment variables');
+      }
+      this._openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY
+      });
+    }
+    return this._openai;
   }
 
   /**
