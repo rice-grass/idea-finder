@@ -10,17 +10,24 @@ function Home() {
   const [error, setError] = useState(null);
 
   const handleGenerateIdeas = async () => {
+    console.log('🚀 [Frontend] Generate Ideas button clicked');
+    console.log('🚀 [Frontend] Parameters:', { language, days });
     setLoading(true);
     setError(null);
 
     try {
+      console.log('📤 [Frontend] Sending request to API...');
       const response = await ideasAPI.generateIdeas(language, days);
+      console.log('📥 [Frontend] Received response:', response);
 
       if (response.data.success) {
         setIdeas(response.data.data.ideas);
         setTrends(response.data.data.trends);
       }
     } catch (err) {
+      console.error('❌ [Frontend] Error occurred:', err);
+      console.error('❌ [Frontend] Error response:', err.response);
+      console.error('❌ [Frontend] Error message:', err.message);
       setError(err.response?.data?.error || 'Failed to generate ideas');
       console.error('Error:', err);
     } finally {

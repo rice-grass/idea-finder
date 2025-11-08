@@ -9,6 +9,7 @@ const router = express.Router();
  * Generate project ideas based on GitHub trends
  */
 router.post('/generate', async (req, res) => {
+  console.log('📥 [API] Received generate ideas request:', { language: req.body.language, days: req.body.days });
   try {
     const { language, days } = req.body;
 
@@ -19,8 +20,10 @@ router.post('/generate', async (req, res) => {
     const trends = githubService.analyzeRepoTrends(repos);
 
     // Generate ideas using OpenAI
+    console.log('🤖 [OpenAI] Generating ideas...');
     const ideas = await openaiService.generateIdeas(trends);
 
+    console.log('✅ [API] Successfully generated ideas');
     res.json({
       success: true,
       data: {
@@ -29,6 +32,7 @@ router.post('/generate', async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('❌ [API] Error:', error.message);
     res.status(500).json({
       success: false,
       error: error.message

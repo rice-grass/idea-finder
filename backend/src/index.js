@@ -30,6 +30,12 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+// Request logging middleware
+app.use((req, res, next) => {
+  console.log(`📨 [${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
+
 // Routes
 app.use('/api/github', githubRoutes);
 app.use('/api/ideas', ideaRoutes);
@@ -39,6 +45,7 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', message: 'Server is running' });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on port ${PORT}`);
+  console.log(`✅ Backend accessible at: http://localhost:${PORT}`);
 });
