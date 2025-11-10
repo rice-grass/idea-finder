@@ -42,4 +42,3 @@ coverage/
 # Temporary files
 *.tmp
 .cache/
-.env.example
