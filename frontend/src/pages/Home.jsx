@@ -133,6 +133,14 @@ function Home() {
       setIdeas(ideasData);
       setTrends(data.trends);
       setGapAnalysis(data.gapAnalysis);
+
+      // 결과 섹션으로 부드럽게 스크롤
+      setTimeout(() => {
+        const resultsSection = document.querySelector('.results-section');
+        if (resultsSection) {
+          resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100); // 상태 업데이트 후 DOM이 업데이트될 시간을 주기 위해 약간의 지연 추가
     } catch (err) {
       console.error('Error generating ideas:', err);
       setError(err.response?.data?.error || '아이디어 생성 중 오류가 발생했습니다.');
