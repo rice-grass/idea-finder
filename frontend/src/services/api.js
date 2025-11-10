@@ -1,16 +1,22 @@
 import axios from 'axios';
 
-// Use relative URL for Vite proxy
-const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+// Determine API base URL based on environment
+// Development: use Vite proxy (empty string)
+// Production: use environment variable or backend URL
+const API_BASE_URL = import.meta.env.PROD
+  ? import.meta.env.VITE_API_BASE_URL || 'https://your-backend-app.onrender.com'
+  : '';
 
-console.log('🔧 [Frontend] API_BASE_URL:', API_BASE_URL || '(using proxy)');
-console.log('🔧 [Frontend] VITE_API_URL:', import.meta.env.VITE_API_URL);
+console.log('🔧 [Frontend] Environment:', import.meta.env.MODE);
+console.log('🔧 [Frontend] Production:', import.meta.env.PROD);
+console.log('🔧 [Frontend] API_BASE_URL:', API_BASE_URL || '(using Vite proxy)');
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json'
-  }
+  },
+  withCredentials: true
 });
 
 // GitHub API endpoints

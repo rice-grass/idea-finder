@@ -26,8 +26,20 @@ console.log('OPENAI_API_KEY length:', process.env.OPENAI_API_KEY?.length);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// CORS configuration
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production'
+    ? [
+        'https://idea-finder-nu.vercel.app',  // Production frontend URL
+        /\.vercel\.app$/  // Allow all Vercel preview deployments
+      ]
+    : ['http://localhost:5173', 'http://localhost:3000'],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Request logging middleware

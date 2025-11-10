@@ -39,7 +39,8 @@ PORT=3000
 ```bash
 cd backend
 npm install
-node src/index.js
+#node src/index.js
+npm start
 ```
 
 서버가 `http://localhost:3000`에서 실행됩니다.
