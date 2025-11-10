@@ -8,13 +8,18 @@ const DeveloperTypeSelector = ({ selectedType, onTypeSelect, developerTypes }) =
     fullstack: '🚀'
   };
 
+  console.log('🎯 DeveloperTypeSelector rendered with:', { selectedType, developerTypes });
+
   return (
     <div className="developer-type-selector">
       <h2>어떤 개발자신가요?</h2>
       <p className="subtitle">당신의 개발 분야를 선택해주세요</p>
 
-      <div className="type-options">
-        {developerTypes.map((type) => (
+      {!developerTypes || developerTypes.length === 0 ? (
+        <div className="loading-message">개발자 유형을 불러오는 중...</div>
+      ) : (
+        <div className="type-options">
+          {developerTypes.map((type) => (
           <div
             key={type.id}
             className={`type-card ${selectedType === type.id ? 'selected' : ''}`}
@@ -25,7 +30,8 @@ const DeveloperTypeSelector = ({ selectedType, onTypeSelect, developerTypes }) =
             <div className="check-mark">{selectedType === type.id && '✓'}</div>
           </div>
         ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -7,7 +7,15 @@
       "Bash(curl:*)",
       "Bash(cat:*)",
       "Bash(node:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(lsof:*)",
+      "Bash(netstat:*)",
+      "Bash(ss:*)",
+      "Bash(kill:*)",
+      "Bash(xargs kill:*)",
+      "Bash(xargs:*)",
+      "Bash(/home/ricegrass/sw/idea-finder/frontend/public/simple.html)",
+      "Bash(ip addr:*)"
     ],
     "deny": [],
     "ask": []
