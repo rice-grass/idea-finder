@@ -105,7 +105,12 @@ router.post('/generate', async (req, res) => {
       data: {
         trends,
         ideas,
-        gapAnalysis: gapAnalysis ? gapAnalysis.summary : null,
+        gapAnalysis: gapAnalysis ? {
+          totalRepos: gapAnalysis.summary.totalRepos,
+          highDemandCount: gapAnalysis.summary.highDemandCount,
+          mediumDemandCount: gapAnalysis.summary.mediumDemandCount,
+          avgGapScore: gapAnalysis.summary.avgGapScore
+        } : null,
         relevantRepos: repos.slice(0, 10).map(r => ({
           name: r.name,
           description: r.description,

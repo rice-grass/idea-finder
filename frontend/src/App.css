@@ -42,9 +42,6 @@
   padding: 2rem 1.5rem;
   background: transparent;
   border-bottom: none;
-  position: sticky;
-  top: 0;
-  z-index: 100;
 }
 
 .wizard-step {
@@ -234,9 +231,6 @@
   padding: 2rem 1.5rem;
   background: transparent;
   border-top: none;
-  position: sticky;
-  bottom: 0;
-  z-index: 100;
 }
 
 .wizard-actions button {
@@ -399,6 +393,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 350px), 1fr));
   gap: 1.5rem;
+  align-items: start;
 }
 
 /* Mobile Responsive */
@@ -406,8 +401,8 @@
   .wizard-steps {
     gap: 0.25rem;
     padding: 1.5rem 1rem;
-    overflow-x: auto;
-    justify-content: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
   }
 
   .wizard-step {

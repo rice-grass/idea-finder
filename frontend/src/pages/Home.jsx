@@ -23,7 +23,6 @@ function Home() {
   const [techError, setTechError] = useState('');
   const [ideas, setIdeas] = useState([]);
   const [trends, setTrends] = useState(null);
-  const [gapAnalysis, setGapAnalysis] = useState(null);
 
   // Load developer types on mount
   useEffect(() => {
@@ -132,7 +131,6 @@ function Home() {
 
       setIdeas(ideasData);
       setTrends(data.trends);
-      setGapAnalysis(data.gapAnalysis);
 
       // 결과 섹션으로 부드럽게 스크롤
       setTimeout(() => {
@@ -155,7 +153,6 @@ function Home() {
     setSelectedTechStacks([]);
     setIdeas([]);
     setTrends(null);
-    setGapAnalysis(null);
     setError('');
     setTechError('');
   };
@@ -295,31 +292,6 @@ function Home() {
       {/* Results Section */}
       {ideas.length > 0 && (
         <div className="results-section">
-          {/* Gap Analysis Summary */}
-          {gapAnalysis && (
-            <div className="gap-summary">
-              <h2>시장 Gap 분석 결과</h2>
-              <div className="gap-stats">
-                <div className="stat-card">
-                  <div className="stat-value">{gapAnalysis.totalRepos}</div>
-                  <div className="stat-label">분석된 저장소</div>
-                </div>
-                <div className="stat-card high-demand">
-                  <div className="stat-value">{gapAnalysis.highDemandCount}</div>
-                  <div className="stat-label">높은 수요 영역</div>
-                </div>
-                <div className="stat-card medium-demand">
-                  <div className="stat-value">{gapAnalysis.mediumDemandCount}</div>
-                  <div className="stat-label">중간 수요 영역</div>
-                </div>
-                <div className="stat-card">
-                  <div className="stat-value">{gapAnalysis.avgGapScore}</div>
-                  <div className="stat-label">평균 Gap 점수</div>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* Trending Topics */}
           {trends && trends.topics && trends.topics.length > 0 && (
             <div className="trends-section">
