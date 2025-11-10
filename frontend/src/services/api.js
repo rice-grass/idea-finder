@@ -26,8 +26,27 @@ export const githubAPI = {
 
 // Ideas API endpoints
 export const ideasAPI = {
-  generateIdeas: (language = '', days = 7) =>
-    api.post('/api/ideas/generate', { language, days }),
+  // Get developer types
+  getDeveloperTypes: () =>
+    api.get('/api/ideas/developer-types'),
+
+  // Get tech stacks for a developer type
+  getTechStacks: (devType) =>
+    api.get(`/api/ideas/tech-stacks/${devType}`),
+
+  // Generate ideas (enhanced version with developer profile)
+  generateIdeas: (params = {}) => {
+    // Support both old and new formats
+    // Old: { language, days }
+    // New: { devType, techStacks, days }
+    const payload = {
+      language: params.language || '',
+      days: params.days || 7,
+      devType: params.devType || null,
+      techStacks: params.techStacks || []
+    };
+    return api.post('/api/ideas/generate', payload);
+  },
 
   analyzeIdea: (ideaDescription) =>
     api.post('/api/ideas/analyze', { ideaDescription })

@@ -1,0 +1,140 @@
+.idea-card {
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 2rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.idea-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.idea-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+  border-color: #667eea;
+}
+
+.gap-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: white;
+}
+
+.gap-badge.high {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+.gap-badge.medium {
+  background: linear-gradient(135deg, #ffd93d 0%, #f9ca24 100%);
+  color: #333;
+  box-shadow: 0 4px 15px rgba(255, 217, 61, 0.3);
+}
+
+.gap-badge.low {
+  background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+  box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+}
+
+.idea-title {
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  padding-right: 120px; /* Space for gap badge */
+}
+
+.idea-description {
+  color: #ccc;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  font-size: 1.05rem;
+}
+
+.idea-section {
+  margin-top: 1.5rem;
+}
+
+.idea-section h4 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  color: #667eea;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.idea-section p {
+  margin: 0;
+  color: #aaa;
+  line-height: 1.6;
+}
+
+.features-list {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: #aaa;
+}
+
+.features-list li {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.features-list li::marker {
+  color: #667eea;
+}
+
+.tech-stack {
+  background: rgba(102, 126, 234, 0.1);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border-left: 3px solid #667eea;
+  font-family: 'Courier New', monospace;
+  font-size: 0.95rem;
+}
+
+.why-needed {
+  background: rgba(118, 75, 162, 0.05);
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 3px solid #764ba2;
+}
+
+.why-needed p {
+  color: #bbb;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .idea-card {
+    padding: 1.5rem;
+  }
+
+  .idea-title {
+    font-size: 1.25rem;
+    padding-right: 100px;
+  }
+
+  .gap-badge {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.8rem;
+  }
+}
