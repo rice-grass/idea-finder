@@ -1,7 +1,7 @@
 import React from 'react';
 import './TechStackSelector.css';
 
-const TechStackSelector = ({ techStacks, selectedStacks, onStackToggle, devType }) => {
+const TechStackSelector = ({ techStacks, selectedStacks, onStackToggle, devType, error }) => {
   const devTypeLabels = {
     frontend: '프론트엔드',
     backend: '백엔드',
@@ -34,9 +34,10 @@ const TechStackSelector = ({ techStacks, selectedStacks, onStackToggle, devType 
         </div>
       )}
 
-      {selectedStacks.length === 0 && (
+      {/* Only show a warning if a parent explicitly passes an error (e.g., after attempting to proceed) */}
+      {error && (
         <div className="selection-warning">
-          최소 1개 이상의 기술 스택을 선택해주세요
+          {error}
         </div>
       )}
     </div>
