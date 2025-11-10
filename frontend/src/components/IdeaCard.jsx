@@ -1,8 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './IdeaCard.css';
+import { saveIdea, removeSavedIdea, isIdeaSaved } from '../utils/savedIdeasStorage';
 
-const IdeaCard = ({ idea }) => {
+const IdeaCard = ({ idea, onRefine }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [showRefineMenu, setShowRefineMenu] = useState(false);
 
   // Debug: Log the idea data
   console.log('IdeaCard received idea:', idea);
@@ -49,6 +52,36 @@ const IdeaCard = ({ idea }) => {
 
   const gapLevel = getGapLevel(gapScore);
 
+  // Check if idea is saved on mount and when idea changes
+  useEffect(() => {
+    const savedIdea = isIdeaSaved(projectName);
+    setIsSaved(!!savedIdea);
+  }, [projectName]);
+
+  // Handle save/unsave
+  const handleSaveToggle = () => {
+    if (isSaved) {
+      const savedIdea = isIdeaSaved(projectName);
+      if (savedIdea && savedIdea.savedId) {
+        removeSavedIdea(savedIdea.savedId);
+        setIsSaved(false);
+      }
+    } else {
+      const success = saveIdea(idea);
+      if (success) {
+        setIsSaved(true);
+      }
+    }
+  };
+
+  // Handle refine options
+  const handleRefine = (refinementType) => {
+    setShowRefineMenu(false);
+    if (onRefine) {
+      onRefine(idea, refinementType);
+    }
+  };
+
   // Debug: Check if detailed fields have data
   console.log('Detailed fields:', {
     implementationPlan,
@@ -61,6 +94,43 @@ const IdeaCard = ({ idea }) => {
 
   return (
     <div className={`idea-card ${isExpanded ? 'expanded' : ''}`}>
+      <div className="idea-card-actions">
+        <button
+          className={`save-button ${isSaved ? 'saved' : ''}`}
+          onClick={handleSaveToggle}
+          title={isSaved ? '저장됨' : '저장하기'}
+        >
+          {isSaved ? '★' : '☆'}
+        </button>
+
+        <div className="refine-menu-container">
+          <button
+            className="refine-button"
+            onClick={() => setShowRefineMenu(!showRefineMenu)}
+            title="아이디어 개선 옵션"
+          >
+            ⚡
+          </button>
+
+          {showRefineMenu && (
+            <div className="refine-menu">
+              <button onClick={() => handleRefine('similar')}>
+                🔄 비슷한 아이디어
+              </button>
+              <button onClick={() => handleRefine('easier')}>
+                📉 더 쉽게
+              </button>
+              <button onClick={() => handleRefine('harder')}>
+                📈 더 어렵게
+              </button>
+              <button onClick={() => handleRefine('focus')}>
+                🎯 특정 기능 집중
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className="idea-card-header">
         {gapScore > 0 && (
           <div className={`gap-badge ${gapLevel}`}>

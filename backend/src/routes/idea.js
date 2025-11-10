@@ -159,4 +159,90 @@ router.post('/analyze', async (req, res) => {
   }
 });
 
+/**
+ * POST /api/ideas/refine
+ * Refine an existing idea
+ */
+router.post('/refine', async (req, res) => {
+  try {
+    const { idea, refinementType, devType, techStacks } = req.body;
+
+    if (!idea) {
+      return res.status(400).json({
+        success: false,
+        error: 'Idea object is required'
+      });
+    }
+
+    if (!refinementType || !['similar', 'easier', 'harder', 'focus'].includes(refinementType)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Valid refinementType is required (similar, easier, harder, focus)'
+      });
+    }
+
+    const context = {
+      devType: devType || 'fullstack',
+      techStacks: techStacks || []
+    };
+
+    const refinedIdeas = await openaiService.refineIdea(idea, refinementType, context);
+
+    res.json({
+      success: true,
+      data: {
+        ideas: Array.isArray(refinedIdeas) ? refinedIdeas : [refinedIdeas],
+        refinementType
+      }
+    });
+  } catch (error) {
+    console.error('Error refining idea:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/ideas/chat
+ * Chat with AI to elaborate on selected ideas
+ */
+router.post('/chat', async (req, res) => {
+  try {
+    const { ideas, message, conversationHistory } = req.body;
+
+    if (!ideas || !Array.isArray(ideas) || ideas.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'At least one idea is required'
+      });
+    }
+
+    if (!message || typeof message !== 'string') {
+      return res.status(400).json({
+        success: false,
+        error: 'Message is required'
+      });
+    }
+
+    console.log(`💬 [Chat] Processing message for ${ideas.length} ideas`);
+
+    const response = await openaiService.chatWithIdeas(ideas, message, conversationHistory || []);
+
+    res.json({
+      success: true,
+      data: {
+        response
+      }
+    });
+  } catch (error) {
+    console.error('❌ [Chat] Error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 export default router;

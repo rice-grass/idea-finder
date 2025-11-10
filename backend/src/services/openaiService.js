@@ -51,6 +51,40 @@ class OpenAIService {
   }
 
   /**
+   * Refine or generate variations of an existing idea
+   * @param {Object} originalIdea - The original idea to refine
+   * @param {string} refinementType - Type of refinement (similar, easier, harder, focus)
+   * @param {Object} context - Additional context (devType, techStacks)
+   */
+  async refineIdea(originalIdea, refinementType, context = {}) {
+    try {
+      const prompt = this.buildRefinePrompt(originalIdea, refinementType, context);
+      const systemPrompt = this.buildSystemPrompt(context.devType);
+
+      const completion = await this.openai.chat.completions.create({
+        model: "gpt-3.5-turbo",
+        messages: [
+          {
+            role: "system",
+            content: systemPrompt
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        temperature: refinementType === 'similar' ? 0.8 : 0.7,
+        max_tokens: 3000
+      });
+
+      return this.parseResponse(completion.choices[0].message.content);
+    } catch (error) {
+      console.error('Error refining idea:', error.message);
+      throw error;
+    }
+  }
+
+  /**
    * Build system prompt based on developer type
    * @param {string} devType - Developer type (frontend, backend, fullstack)
    */
@@ -181,6 +215,86 @@ class OpenAIService {
   }
 
   /**
+   * Build prompt for refining an existing idea
+   * @param {Object} originalIdea - The original idea
+   * @param {string} refinementType - Type of refinement
+   * @param {Object} context - Additional context
+   */
+  buildRefinePrompt(originalIdea, refinementType, context = {}) {
+    const projectName = originalIdea['Project Name'] || 'Unnamed Project';
+    const description = originalIdea['Description'] || '';
+    const techStack = originalIdea['Tech Stack'] || '';
+    const difficulty = originalIdea['Difficulty Level'] || '';
+
+    const refinementInstructions = {
+      similar: `다음 프로젝트와 비슷하지만 다른 각도에서 접근하는 새로운 아이디어를 1개 생성해주세요:
+
+프로젝트: ${projectName}
+설명: ${description}
+기술 스택: ${techStack}
+
+비슷한 문제 영역을 다루지만, 다른 사용자층이나 다른 구현 방식으로 접근하는 아이디어를 제안해주세요.`,
+
+      easier: `다음 프로젝트를 초보자도 쉽게 구현할 수 있도록 단순화한 버전을 1개 생성해주세요:
+
+프로젝트: ${projectName}
+설명: ${description}
+현재 난이도: ${difficulty}
+
+핵심 기능은 유지하되, 구현 난이도를 낮추고 필요한 기술을 줄인 버전을 제안해주세요. 난이도는 "초급" 또는 "중급"이어야 합니다.`,
+
+      harder: `다음 프로젝트를 더 고급 개발자를 위한 챌린징한 버전으로 확장한 아이디어를 1개 생성해주세요:
+
+프로젝트: ${projectName}
+설명: ${description}
+현재 난이도: ${difficulty}
+
+더 복잡한 기능, 확장성, 성능 최적화, 고급 아키텍처 패턴을 포함한 버전을 제안해주세요. 난이도는 "고급"이어야 합니다.`,
+
+      focus: `다음 프로젝트의 핵심 기능 중 하나에 집중한 전문화된 버전을 1개 생성해주세요:
+
+프로젝트: ${projectName}
+설명: ${description}
+기술 스택: ${techStack}
+
+프로젝트의 특정 기능이나 측면을 깊이 있게 파고드는 전문화된 도구나 라이브러리 아이디어를 제안해주세요.`
+    };
+
+    const instruction = refinementInstructions[refinementType] || refinementInstructions.similar;
+
+    let prompt = `${instruction}
+
+${context.techStacks && context.techStacks.length > 0 ? `선호하는 기술 스택: ${context.techStacks.join(', ')}` : ''}
+
+다음 JSON 형식으로 정확히 1개의 아이디어를 생성해주세요:
+
+[
+  {
+    "Project Name": "프로젝트 이름 (영어로)",
+    "Description": "2-3문장으로 프로젝트 설명",
+    "Target Audience": "누구를 위한 프로젝트인지",
+    "Key Features": ["주요 기능 1", "주요 기능 2", "주요 기능 3"],
+    "Tech Stack": "사용할 기술 스택 (영어로, 쉼표로 구분)",
+    "Why it's needed": "왜 이 프로젝트가 필요한지 설명",
+    "Gap Score": 7,
+    "Implementation Plan": ["구현 단계 1", "구현 단계 2", "구현 단계 3", "구현 단계 4"],
+    "Estimated Time": "예상 소요 시간 (예: 2-3주, 1-2개월)",
+    "Difficulty Level": "난이도 (초급/중급/고급)",
+    "Required Libraries": ["필요한 라이브러리 1", "필요한 라이브러리 2"],
+    "Learning Resources": ["학습 리소스 1", "학습 리소스 2"],
+    "Potential Challenges": ["도전 과제 1", "도전 과제 2"]
+  }
+]
+
+**중요:**
+- 기술 용어(Node.js, API, React, Vue 등)는 영어 그대로 표기
+- 설명 문장은 한국어로 작성
+- 응답은 위와 같은 JSON 배열로만 시작하고 끝나야 하며, 다른 텍스트를 포함하지 마세요`;
+
+    return prompt;
+  }
+
+  /**
    * Parse OpenAI response
    * @param {string} response - Raw response from OpenAI
    */
@@ -280,6 +394,59 @@ class OpenAIService {
       return completion.choices[0].message.content;
     } catch (error) {
       console.error('Error analyzing idea:', error.message);
+      throw error;
+    }
+  }
+
+  /**
+   * Chat with AI about selected ideas
+   * @param {Array} ideas - Array of selected ideas
+   * @param {string} message - User's message
+   * @param {Array} conversationHistory - Previous conversation messages
+   */
+  async chatWithIdeas(ideas, message, conversationHistory = []) {
+    try {
+      // Build context from selected ideas
+      const ideasContext = ideas.map((idea, index) => {
+        return `아이디어 ${index + 1}: ${idea['Project Name'] || '제목 없음'}
+설명: ${idea['Description'] || '설명 없음'}
+기술 스택: ${idea['Tech Stack'] || '없음'}
+타겟: ${idea['Target Audience'] || '없음'}
+핵심 기능: ${Array.isArray(idea['Key Features']) ? idea['Key Features'].join(', ') : '없음'}`;
+      }).join('\n\n');
+
+      const systemPrompt = `당신은 소프트웨어 프로젝트 아이디어를 구체화하는 전문 컨설턴트입니다.
+사용자가 선택한 프로젝트 아이디어들에 대해 구체적이고 실용적인 조언을 제공합니다.
+
+다음 아이디어들에 대해 논의하고 있습니다:
+
+${ideasContext}
+
+답변 시 다음을 유의하세요:
+- 구체적이고 실행 가능한 조언 제공
+- 기술적인 세부사항 포함
+- 구현 단계별 가이드 제시
+- 잠재적인 도전과제와 해결방안 제시
+- 마크다운 형식으로 보기 좋게 작성 (제목, 리스트, 코드 블록 등 활용)
+- 한국어로 답변하되, 기술 용어는 영어로 표기`;
+
+      // Build messages array
+      const messages = [
+        { role: "system", content: systemPrompt },
+        ...conversationHistory,
+        { role: "user", content: message }
+      ];
+
+      const completion = await this.openai.chat.completions.create({
+        model: "gpt-3.5-turbo",
+        messages: messages,
+        temperature: 0.7,
+        max_tokens: 2000
+      });
+
+      return completion.choices[0].message.content;
+    } catch (error) {
+      console.error('Error in chat:', error.message);
       throw error;
     }
   }

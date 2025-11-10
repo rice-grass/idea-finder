@@ -50,7 +50,24 @@ export const ideasAPI = {
   },
 
   analyzeIdea: (ideaDescription) =>
-    api.post('/api/ideas/analyze', { ideaDescription })
+    api.post('/api/ideas/analyze', { ideaDescription }),
+
+  // Refine an existing idea
+  refineIdea: (idea, refinementType, context = {}) =>
+    api.post('/api/ideas/refine', {
+      idea,
+      refinementType,
+      devType: context.devType || 'fullstack',
+      techStacks: context.techStacks || []
+    }),
+
+  // Chat with AI about selected ideas
+  chatWithIdeas: (ideas, message, conversationHistory = []) =>
+    api.post('/api/ideas/chat', {
+      ideas,
+      message,
+      conversationHistory
+    })
 };
 
 // Health check

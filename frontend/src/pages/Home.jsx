@@ -4,6 +4,8 @@ import WizardSteps from '../components/WizardSteps';
 import DeveloperTypeSelector from '../components/DeveloperTypeSelector';
 import TechStackSelector from '../components/TechStackSelector';
 import IdeaCard from '../components/IdeaCard';
+import SavedIdeas from '../components/SavedIdeas';
+import { getSavedIdeas } from '../utils/savedIdeasStorage';
 
 function Home() {
   // Wizard state
@@ -24,10 +26,24 @@ function Home() {
   const [ideas, setIdeas] = useState([]);
   const [trends, setTrends] = useState(null);
 
+  // Saved Ideas modal
+  const [showSavedIdeas, setShowSavedIdeas] = useState(false);
+  const [savedIdeasCount, setSavedIdeasCount] = useState(0);
+
+  // Page transition state
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
   // Load developer types on mount
   useEffect(() => {
     loadDeveloperTypes();
+    updateSavedIdeasCount();
   }, []);
+
+  // Update saved ideas count
+  const updateSavedIdeasCount = () => {
+    const saved = getSavedIdeas();
+    setSavedIdeasCount(saved.length);
+  };
 
   // Load tech stacks when developer type changes
   useEffect(() => {
@@ -113,8 +129,13 @@ function Home() {
   };
 
   const handleGenerateIdeas = async () => {
+    // Start transition animation
+    setIsTransitioning(true);
     setLoading(true);
     setError('');
+
+    // Wait for exit animation to complete
+    await new Promise(resolve => setTimeout(resolve, 300));
 
     try {
       const response = await ideasAPI.generateIdeas({
@@ -131,6 +152,7 @@ function Home() {
 
       setIdeas(ideasData);
       setTrends(data.trends);
+      setIsTransitioning(false);
 
       // 결과 섹션으로 부드럽게 스크롤
       setTimeout(() => {
@@ -138,10 +160,42 @@ function Home() {
         if (resultsSection) {
           resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-      }, 100); // 상태 업데이트 후 DOM이 업데이트될 시간을 주기 위해 약간의 지연 추가
+      }, 100);
     } catch (err) {
       console.error('Error generating ideas:', err);
       setError(err.response?.data?.error || '아이디어 생성 중 오류가 발생했습니다.');
+      setIsTransitioning(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRefineIdea = async (originalIdea, refinementType) => {
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await ideasAPI.refineIdea(originalIdea, refinementType, {
+        devType: selectedDevType,
+        techStacks: selectedTechStacks
+      });
+
+      const refinedIdeas = response.data.data.ideas;
+
+      // Add refined ideas to the existing list
+      setIdeas(prevIdeas => [...prevIdeas, ...refinedIdeas]);
+
+      // Scroll to the new idea
+      setTimeout(() => {
+        const allCards = document.querySelectorAll('.idea-card');
+        if (allCards.length > 0) {
+          const lastCard = allCards[allCards.length - 1];
+          lastCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    } catch (err) {
+      console.error('Error refining idea:', err);
+      setError(err.response?.data?.error || '아이디어 개선 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
@@ -157,12 +211,114 @@ function Home() {
     setTechError('');
   };
 
+  // Show loading screen during transition
+  if (loading && isTransitioning) {
+    return (
+      <div className="container">
+        <div className="fullscreen-loading">
+          <div className="loader"></div>
+          <p>아이디어를 생성하고 있습니다...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show results page independently
+  if (ideas.length > 0) {
+    return (
+      <div className="container">
+        <header className="header">
+          <div className="header-content">
+            <h1>Open Source Project Idea Generator</h1>
+            <p>개발자 맞춤형 오픈소스 프로젝트 아이디어를 AI가 찾아드립니다</p>
+          </div>
+          <button
+            className="saved-ideas-button"
+            onClick={() => {
+              setShowSavedIdeas(true);
+              updateSavedIdeasCount();
+            }}
+          >
+            저장된 아이디어 {savedIdeasCount > 0 && `(${savedIdeasCount})`}
+          </button>
+        </header>
+
+        {showSavedIdeas && (
+          <SavedIdeas
+            onClose={() => {
+              setShowSavedIdeas(false);
+              updateSavedIdeasCount();
+            }}
+          />
+        )}
+
+        <div className="results-section">
+          {trends && trends.topics && trends.topics.length > 0 && (
+            <div className="trends-section">
+              <h2>🔥 트렌딩 토픽</h2>
+              <div className="topics-grid">
+                {trends.topics.slice(0, 8).map(([topic, count]) => (
+                  <div key={topic} className="topic-tag">
+                    <span className="topic-name">{topic}</span>
+                    <span className="topic-count">{count}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="ideas-header">
+            <h2>맞춤형 프로젝트 아이디어</h2>
+            <p className="ideas-count">총 {ideas.length}개의 아이디어</p>
+          </div>
+
+          <div className="ideas-grid">
+            {ideas.map((idea, index) => (
+              <IdeaCard
+                key={index}
+                idea={idea}
+                onRefine={handleRefineIdea}
+              />
+            ))}
+          </div>
+
+          <div className="wizard-actions">
+            <button onClick={handleReset} className="btn btn-secondary">
+              ← 새로운 아이디어 생성
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show wizard/generation page
   return (
     <div className="container">
       <header className="header">
-        <h1>Open Source Project Idea Generator</h1>
-        <p>개발자 맞춤형 오픈소스 프로젝트 아이디어를 AI가 찾아드립니다</p>
+        <div className="header-content">
+          <h1>Open Source Project Idea Generator</h1>
+          <p>개발자 맞춤형 오픈소스 프로젝트 아이디어를 AI가 찾아드립니다</p>
+        </div>
+        <button
+          className="saved-ideas-button"
+          onClick={() => {
+            setShowSavedIdeas(true);
+            updateSavedIdeasCount();
+          }}
+        >
+          💾 저장된 아이디어 {savedIdeasCount > 0 && `(${savedIdeasCount})`}
+        </button>
       </header>
+
+      {showSavedIdeas && (
+        <SavedIdeas
+          onClose={() => {
+            setShowSavedIdeas(false);
+            updateSavedIdeasCount();
+          }}
+        />
+      )}
 
       <WizardSteps currentStep={currentStep} steps={wizardSteps} />
 
@@ -172,7 +328,7 @@ function Home() {
         </div>
       )}
 
-      <div className="wizard-content">
+      <div className={`wizard-content ${isTransitioning ? 'exiting' : ''}`}>
         {/* Step 1: Developer Type Selection */}
         {currentStep === 1 && (
           loading && developerTypes.length === 0 ? (
@@ -289,37 +445,6 @@ function Home() {
         </div>
       )}
 
-      {/* Results Section */}
-      {ideas.length > 0 && (
-        <div className="results-section">
-          {/* Trending Topics */}
-          {trends && trends.topics && trends.topics.length > 0 && (
-            <div className="trends-section">
-              <h2>트렌딩 토픽</h2>
-              <div className="topics-grid">
-                {trends.topics.slice(0, 8).map(([topic, count]) => (
-                  <div key={topic} className="topic-tag">
-                    <span className="topic-name">{topic}</span>
-                    <span className="topic-count">{count}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Ideas Grid */}
-          <div className="ideas-header">
-            <h2>맞춤형 프로젝트 아이디어</h2>
-            <p className="ideas-count">총 {ideas.length}개의 아이디어</p>
-          </div>
-
-          <div className="ideas-grid">
-            {ideas.map((idea, index) => (
-              <IdeaCard key={index} idea={idea} />
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
