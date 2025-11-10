@@ -101,6 +101,21 @@
   margin-bottom: 20px;
 }
 
+.error-state {
+  text-align: center;
+  padding: 3rem;
+}
+
+.error-state p {
+  color: #ff6b6b;
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.error-state button {
+  margin-top: 1rem;
+}
+
 .trends-section,
 .ideas-section {
   margin-bottom: 40px;

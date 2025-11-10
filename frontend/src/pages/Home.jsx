@@ -37,12 +37,19 @@ function Home() {
   }, [selectedDevType]);
 
   const loadDeveloperTypes = async () => {
+    setLoading(true);
     try {
+      console.log('🔄 Loading developer types...');
       const response = await ideasAPI.getDeveloperTypes();
+      console.log('✅ Developer types loaded:', response.data.data);
       setDeveloperTypes(response.data.data);
+      setError('');
     } catch (err) {
-      console.error('Error loading developer types:', err);
-      setError('개발자 유형을 불러올 수 없습니다.');
+      console.error('❌ Error loading developer types:', err);
+      console.error('Error details:', err.response || err.message);
+      setError(`개발자 유형을 불러올 수 없습니다. ${err.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -157,11 +164,23 @@ function Home() {
       <div className="wizard-content">
         {/* Step 1: Developer Type Selection */}
         {currentStep === 1 && (
-          <DeveloperTypeSelector
-            selectedType={selectedDevType}
-            onTypeSelect={handleDevTypeSelect}
-            developerTypes={developerTypes}
-          />
+          loading && developerTypes.length === 0 ? (
+            <div className="loading-container">
+              <div className="loader"></div>
+              <p>개발자 유형을 불러오는 중...</p>
+            </div>
+          ) : error && !loading ? (
+            <div className="error-state">
+              <p>{error}</p>
+              <button onClick={loadDeveloperTypes} className="btn btn-primary">다시 시도</button>
+            </div>
+          ) : (
+            <DeveloperTypeSelector
+              selectedType={selectedDevType}
+              onTypeSelect={handleDevTypeSelect}
+              developerTypes={developerTypes}
+            />
+          )
         )}
 
         {/* Step 2: Tech Stack Selection */}

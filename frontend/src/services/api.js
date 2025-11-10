@@ -1,8 +1,9 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+// Use relative URL for Vite proxy
+const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
-console.log('🔧 [Frontend] API_BASE_URL:', API_BASE_URL);
+console.log('🔧 [Frontend] API_BASE_URL:', API_BASE_URL || '(using proxy)');
 console.log('🔧 [Frontend] VITE_API_URL:', import.meta.env.VITE_API_URL);
 
 const api = axios.create({
