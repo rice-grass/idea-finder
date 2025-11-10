@@ -15,7 +15,8 @@
       "Bash(xargs kill:*)",
       "Bash(xargs:*)",
       "Bash(/home/ricegrass/sw/idea-finder/frontend/public/simple.html)",
-      "Bash(ip addr:*)"
+      "Bash(ip addr:*)",
+      "Bash(git restore:*)"
     ],
     "deny": [],
     "ask": []
