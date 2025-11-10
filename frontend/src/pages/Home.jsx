@@ -20,6 +20,7 @@ function Home() {
   // Results
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [techError, setTechError] = useState('');
   const [ideas, setIdeas] = useState([]);
   const [trends, setTrends] = useState(null);
   const [gapAnalysis, setGapAnalysis] = useState(null);
@@ -58,6 +59,7 @@ function Home() {
       const response = await ideasAPI.getTechStacks(devType);
       setAvailableTechStacks(response.data.data);
       setSelectedTechStacks([]); // Reset selection
+      setTechError('');
     } catch (err) {
       console.error('Error loading tech stacks:', err);
       setError('기술 스택을 불러올 수 없습니다.');
@@ -78,6 +80,7 @@ function Home() {
       }
     });
     setError('');
+    setTechError('');
   };
 
   const handleNextStep = () => {
@@ -88,7 +91,8 @@ function Home() {
     }
 
     if (currentStep === 2 && selectedTechStacks.length === 0) {
-      setError('최소 1개 이상의 기술 스택을 선택해주세요.');
+      // Show a local, inline error for tech stack selection rather than the global error banner.
+      setTechError('최소 1개 이상의 기술 스택을 선택해주세요.');
       return;
     }
 
@@ -105,6 +109,7 @@ function Home() {
     if (currentStep > 1) {
       setCurrentStep(prev => prev - 1);
       setError('');
+      setTechError('');
     }
   };
 
@@ -128,6 +133,14 @@ function Home() {
       setIdeas(ideasData);
       setTrends(data.trends);
       setGapAnalysis(data.gapAnalysis);
+
+      // 결과 섹션으로 부드럽게 스크롤
+      setTimeout(() => {
+        const resultsSection = document.querySelector('.results-section');
+        if (resultsSection) {
+          resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100); // 상태 업데이트 후 DOM이 업데이트될 시간을 주기 위해 약간의 지연 추가
     } catch (err) {
       console.error('Error generating ideas:', err);
       setError(err.response?.data?.error || '아이디어 생성 중 오류가 발생했습니다.');
@@ -144,6 +157,7 @@ function Home() {
     setTrends(null);
     setGapAnalysis(null);
     setError('');
+    setTechError('');
   };
 
   return (
@@ -190,6 +204,7 @@ function Home() {
             selectedStacks={selectedTechStacks}
             onStackToggle={handleTechStackToggle}
             devType={selectedDevType}
+            error={techError}
           />
         )}
 
