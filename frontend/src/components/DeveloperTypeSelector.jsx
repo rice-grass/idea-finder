@@ -27,7 +27,6 @@ const DeveloperTypeSelector = ({ selectedType, onTypeSelect, developerTypes }) =
           >
             <div className="type-icon">{typeIcons[type.id] || '💻'}</div>
             <h3>{type.label}</h3>
-            <div className="check-mark">{selectedType === type.id && '✓'}</div>
           </div>
         ))}
         </div>
