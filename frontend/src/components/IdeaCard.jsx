@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import './IdeaCard.css';
 import { saveIdea, removeSavedIdea, isIdeaSaved } from '../utils/savedIdeasStorage';
 
-const IdeaCard = ({ idea, onRefine }) => {
+const IdeaCard = ({ idea, onRefine, metadata, onSaveChange }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [showRefineMenu, setShowRefineMenu] = useState(false);
@@ -65,11 +65,17 @@ const IdeaCard = ({ idea, onRefine }) => {
       if (savedIdea && savedIdea.savedId) {
         removeSavedIdea(savedIdea.savedId);
         setIsSaved(false);
+        if (onSaveChange) {
+          onSaveChange();
+        }
       }
     } else {
-      const success = saveIdea(idea);
+      const success = saveIdea(idea, metadata);
       if (success) {
         setIsSaved(true);
+        if (onSaveChange) {
+          onSaveChange();
+        }
       }
     }
   };
@@ -94,75 +100,79 @@ const IdeaCard = ({ idea, onRefine }) => {
 
   return (
     <div className={`idea-card ${isExpanded ? 'expanded' : ''}`}>
-      <div className="idea-card-actions">
-        <button
-          className={`save-button ${isSaved ? 'saved' : ''}`}
-          onClick={handleSaveToggle}
-          title={isSaved ? '저장됨' : '저장하기'}
-        >
-          {isSaved ? '★' : '☆'}
-        </button>
+      <h3 className="idea-title">{projectName}</h3>
 
-        <div className="refine-menu-container">
-          <button
-            className="refine-button"
-            onClick={() => setShowRefineMenu(!showRefineMenu)}
-            title="아이디어 개선 옵션"
-          >
-            ⚡
-          </button>
-
-          {showRefineMenu && (
-            <div className="refine-menu">
-              <button onClick={() => handleRefine('similar')}>
-                🔄 비슷한 아이디어
-              </button>
-              <button onClick={() => handleRefine('easier')}>
-                📉 더 쉽게
-              </button>
-              <button onClick={() => handleRefine('harder')}>
-                📈 더 어렵게
-              </button>
-              <button onClick={() => handleRefine('focus')}>
-                🎯 특정 기능 집중
-              </button>
+      <div className="idea-card-header">
+        <div className="idea-card-badges">
+          {gapScore > 0 && (
+            <div className={`gap-badge ${gapLevel}`}>
+              Gap Score: {gapScore}/10
+            </div>
+          )}
+          {difficultyLevel && (
+            <div className={`difficulty-badge ${getDifficultyClass(difficultyLevel)}`}>
+              {difficultyLevel}
+            </div>
+          )}
+          {estimatedTime && (
+            <div className="time-badge">
+              {estimatedTime}
             </div>
           )}
         </div>
+
+        <div className="idea-card-actions">
+          <button
+            className={`save-button ${isSaved ? 'saved' : ''}`}
+            onClick={handleSaveToggle}
+            title={isSaved ? '저장됨' : '저장하기'}
+          >
+            {isSaved ? '저장됨' : '저장'}
+          </button>
+
+          <div className="refine-menu-container">
+            <button
+              className="refine-button"
+              onClick={() => setShowRefineMenu(!showRefineMenu)}
+              title="아이디어 개선 옵션"
+            >
+              개선
+            </button>
+
+            {showRefineMenu && (
+              <div className="refine-menu">
+                <button onClick={() => handleRefine('similar')}>
+                  비슷한 아이디어
+                </button>
+                <button onClick={() => handleRefine('easier')}>
+                  더 쉽게
+                </button>
+                <button onClick={() => handleRefine('harder')}>
+                  더 어렵게
+                </button>
+                <button onClick={() => handleRefine('focus')}>
+                  특정 기능 집중
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
-      <div className="idea-card-header">
-        {gapScore > 0 && (
-          <div className={`gap-badge ${gapLevel}`}>
-            Gap Score: {gapScore}/10
-          </div>
-        )}
-        {difficultyLevel && (
-          <div className={`difficulty-badge ${getDifficultyClass(difficultyLevel)}`}>
-            {difficultyLevel}
-          </div>
-        )}
-        {estimatedTime && (
-          <div className="time-badge">
-            ⏱️ {estimatedTime}
-          </div>
-        )}
-      </div>
-
-      <h3 className="idea-title">{projectName}</h3>
+      <div className="idea-card-content">
 
       <p className="idea-description">{description}</p>
 
       {targetAudience && (
         <div className="idea-section">
-          <h4>🎯 Target Audience</h4>
+          <h4>Target Audience</h4>
           <p>{targetAudience}</p>
         </div>
       )}
 
       {features && features.length > 0 && (
         <div className="idea-section">
-          <h4>✨ Key Features</h4>
+          <h4>Key Features</h4>
           <ul className="features-list">
             {features.map((feature, index) => (
               <li key={index}>{feature}</li>
@@ -173,14 +183,14 @@ const IdeaCard = ({ idea, onRefine }) => {
 
       {techStack && (
         <div className="idea-section">
-          <h4>🛠️ Tech Stack</h4>
+          <h4>Tech Stack</h4>
           <p className="tech-stack">{techStack}</p>
         </div>
       )}
 
       {whyNeeded && (
         <div className="idea-section why-needed">
-          <h4>💡 Market Gap</h4>
+          <h4>Market Gap</h4>
           <p>{whyNeeded}</p>
         </div>
       )}
@@ -190,7 +200,7 @@ const IdeaCard = ({ idea, onRefine }) => {
         <div className="idea-details">
           {implementationPlan && implementationPlan.length > 0 && (
             <div className="idea-section">
-              <h4>📋 Implementation Plan</h4>
+              <h4>Implementation Plan</h4>
               <ol className="implementation-list">
                 {implementationPlan.map((step, index) => (
                   <li key={index}>{step}</li>
@@ -212,7 +222,7 @@ const IdeaCard = ({ idea, onRefine }) => {
 
           {learningResources && learningResources.length > 0 && (
             <div className="idea-section">
-              <h4>📚 Learning Resources</h4>
+              <h4>Learning Resources</h4>
               <ul className="resources-list">
                 {learningResources.map((resource, index) => (
                   <li key={index}>{resource}</li>
@@ -223,7 +233,7 @@ const IdeaCard = ({ idea, onRefine }) => {
 
           {potentialChallenges && potentialChallenges.length > 0 && (
             <div className="idea-section challenges">
-              <h4>⚠️ Potential Challenges</h4>
+              <h4>Potential Challenges</h4>
               <ul className="challenges-list">
                 {potentialChallenges.map((challenge, index) => (
                   <li key={index}>{challenge}</li>
@@ -233,12 +243,13 @@ const IdeaCard = ({ idea, onRefine }) => {
           )}
         </div>
       )}
+      </div>
 
       <button
         className="expand-button"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        {isExpanded ? '▲ 간단히 보기' : '▼ 상세 정보 보기'}
+        {isExpanded ? '간단히 보기' : '상세 정보 보기'}
       </button>
     </div>
   );

@@ -3,14 +3,14 @@
   line-height: 1.6;
   font-weight: 400;
 
-  --primary-color: #2563eb;
-  --primary-dark: #1e40af;
-  --secondary-color: #10b981;
-  --text-primary: #111827;
-  --text-secondary: #6b7280;
-  --bg-primary: #ffffff;
+  --primary-color: #2b76ff;
+  --primary-dark: #1e55d8;
+  --secondary-color: #7886ff;
+  --text-primary: #111;
+  --text-secondary: #666;
+  --bg-primary: #fffbf7;
   --bg-secondary: #f9fafb;
-  --border-color: #e5e7eb;
+  --border-color: #d7e2e9;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -32,51 +32,12 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: var(--bg-secondary);
+  background: var(--bg-primary);
   color: var(--text-primary);
   overflow-x: hidden;
   position: relative;
 }
 
-/* Animated Background */
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  opacity: 0.03;
-  z-index: -2;
-}
-
-body::after {
-  content: '';
-  position: fixed;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background:
-    radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 40% 20%, rgba(37, 99, 235, 0.1) 0%, transparent 50%);
-  animation: gradientShift 20s ease infinite;
-  z-index: -1;
-}
-
-@keyframes gradientShift {
-  0%, 100% {
-    transform: translate(0, 0) rotate(0deg);
-  }
-  33% {
-    transform: translate(5%, 5%) rotate(120deg);
-  }
-  66% {
-    transform: translate(-5%, 5%) rotate(240deg);
-  }
-}
 
 #root {
   display: flex;
@@ -115,11 +76,11 @@ h3 {
 }
 
 button {
-  border-radius: 8px;
+  border-radius: 10px;
   border: none;
   padding: 12px 24px;
   font-size: 0.9375rem;
-  font-weight: 500;
+  font-weight: 600;
   font-family: inherit;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -173,7 +134,7 @@ select {
   font-size: 0.9375rem;
   padding: 12px;
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 10px;
   background: white;
   color: var(--text-primary);
   transition: all 0.2s;
@@ -184,7 +145,7 @@ input:focus,
 textarea:focus,
 select:focus {
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  box-shadow: 0 0 0 3px rgba(43, 118, 255, 0.1);
 }
 
 /* Loading Spinner */

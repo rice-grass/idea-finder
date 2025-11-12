@@ -18,60 +18,100 @@
 }
 
 .stack-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  justify-content: center;
-
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: 1rem;
   max-width: 1000px;
   margin: 0 auto 2rem;
-
 }
 
-.stack-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
+.stack-card {
   background: white;
   border: 2px solid var(--border-color);
-  border-radius: 999px;
+  border-radius: 12px;
+  padding: 1.75rem 1.25rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: 0.9375rem;
-  user-select: none;
+  position: relative;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
-  font-weight: 500;
 }
 
-.stack-chip:hover {
+.stack-card:hover {
   border-color: var(--primary-color);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(37, 99, 235, 0.15);
+}
+
+.stack-card:active {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-sm);
 }
 
-.stack-chip:active {
-  transform: translateY(0);
-}
-
-.stack-chip.selected {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+.stack-card.selected {
   border-color: var(--primary-color);
-  color: white;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(37, 99, 235, 0.04) 100%);
+  box-shadow: 0 8px 16px rgba(37, 99, 235, 0.15);
+}
+
+.stack-card h3 {
+  margin: 0;
+  font-size: clamp(1rem, 2.5vw, 1.125rem);
+  color: var(--text-primary);
   font-weight: 600;
-  box-shadow: var(--shadow-sm);
+  text-align: center;
 }
 
-.stack-name {
-  font-size: 0.9375rem;
-  line-height: 1;
-}
-
-.check-icon {
+.stack-card .check-mark {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 24px;
+  height: 24px;
+  background: var(--primary-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
   font-weight: bold;
   font-size: 0.875rem;
-  line-height: 1;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+
+.other-input-container {
+  margin-top: 1.5rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.other-input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 15px;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  background: white;
+  color: var(--text-primary);
+  transition: all 0.2s;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+.other-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.other-input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
 }
 
 .selection-summary {
@@ -112,16 +152,21 @@
 /* Mobile Optimizations */
 @media (max-width: 768px) {
   .stack-grid {
-    gap: 0.625rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
+    gap: 0.875rem;
   }
 
-  .stack-chip {
-    padding: 0.625rem 1rem;
-    font-size: 0.875rem;
+  .stack-card {
+    padding: 1.5rem 1rem;
+    min-height: 70px;
   }
 
-  .stack-name {
-    font-size: 0.875rem;
+  .stack-card .check-mark {
+    width: 20px;
+    height: 20px;
+    font-size: 0.75rem;
+    top: 0.5rem;
+    right: 0.5rem;
   }
 
   .selection-summary,
@@ -133,7 +178,13 @@
 }
 
 @media (max-width: 480px) {
-  .stack-chip {
-    padding: 0.5rem 0.875rem;
+  .stack-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .stack-card {
+    padding: 1.25rem 0.75rem;
+    min-height: 65px;
   }
 }

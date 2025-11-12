@@ -93,13 +93,39 @@ const SavedIdeas = ({ onClose }) => {
               </label>
             </div>
 
+            {selectedIds.size > 0 && (
+              <div className="selection-summary-box">
+                <h3>선택한 아이디어 ({selectedIds.size}개)</h3>
+                <div className="selected-ideas-preview">
+                  {getSelectedIdeas().map((idea, index) => {
+                    const title = idea['Project Name'] || idea.title || '제목 없음';
+                    const description = idea['Description'] || idea.description || '';
+                    return (
+                      <div key={idea.savedId} className="preview-item">
+                        <span className="preview-number">{index + 1}.</span>
+                        <div className="preview-content">
+                          <p className="preview-title">{title}</p>
+                          {description && (
+                            <p className="preview-description">
+                              {description.length > 80
+                                ? `${description.substring(0, 80)}...`
+                                : description}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             <div className="saved-ideas-actions">
               <button
                 className="chat-button"
                 onClick={handleOpenChatbot}
                 disabled={selectedIds.size === 0}
               >
-                <span className="button-icon">💬</span>
                 아이디어 컨설팅 시작
               </button>
               <button
@@ -124,17 +150,43 @@ const SavedIdeas = ({ onClose }) => {
               {savedIdeas.map((idea) => (
                 <div
                   key={idea.savedId}
-                  className={`saved-idea-item ${selectedIds.has(idea.savedId) ? 'selected' : ''}`}
+                  className={`saved-idea-container ${selectedIds.has(idea.savedId) ? 'selected' : ''}`}
+                  onClick={() => handleToggleSelect(idea.savedId)}
                   onContextMenu={handleIdeaChange}
                 >
-                  <label className="idea-checkbox">
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.has(idea.savedId)}
-                      onChange={() => handleToggleSelect(idea.savedId)}
-                    />
-                  </label>
-                  <IdeaCard idea={idea} />
+                  {idea.metadata && (
+                    <div className="saved-idea-header">
+                      {idea.metadata.devTypeLabel && (
+                        <span className="metadata-text">{idea.metadata.devTypeLabel}</span>
+                      )}
+                      {idea.metadata.days && (
+                        <>
+                          {idea.metadata.devTypeLabel && <span className="metadata-dot">•</span>}
+                          <span className="metadata-text">최근 {idea.metadata.days}일</span>
+                        </>
+                      )}
+                      {idea.metadata.techStacks && idea.metadata.techStacks.length > 0 && (
+                        <>
+                          {(idea.metadata.devTypeLabel || idea.metadata.days) && <span className="metadata-dot">•</span>}
+                          <span className="metadata-text">
+                            {idea.metadata.techStacks.slice(0, 2).join(', ')}
+                            {idea.metadata.techStacks.length > 2 && ` 외 ${idea.metadata.techStacks.length - 2}개`}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  )}
+                  <div className="saved-idea-card">
+                    <IdeaCard idea={idea} />
+                  </div>
+                  {selectedIds.has(idea.savedId) && (
+                    <div className="selection-indicator">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" fill="currentColor"/>
+                        <path d="M7 12L10.5 15.5L17 9" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

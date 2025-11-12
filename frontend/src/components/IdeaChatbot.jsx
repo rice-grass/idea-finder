@@ -29,11 +29,11 @@ const IdeaChatbot = ({ ideas, onClose }) => {
       role: 'assistant',
       content: `선택하신 ${ideas.length}개의 프로젝트 아이디어에 대한 컨설팅을 시작합니다.\n\n**선택된 프로젝트:**\n${ideasSummary}\n\n어떤 방향으로 도와드릴까요?`,
       options: [
-        { id: 'implementation', label: '구현 계획 수립', emoji: '📋' },
-        { id: 'tech-stack', label: '기술 스택 추천', emoji: '🛠️' },
-        { id: 'architecture', label: '아키텍처 설계', emoji: '🏗️' },
-        { id: 'mvp', label: 'MVP 전략', emoji: '🚀' },
-        { id: 'challenges', label: '기술적 과제 분석', emoji: '⚠️' }
+        { id: 'implementation', label: '구현 계획 수립' },
+        { id: 'tech-stack', label: '기술 스택 추천' },
+        { id: 'architecture', label: '아키텍처 설계' },
+        { id: 'mvp', label: 'MVP 전략' },
+        { id: 'challenges', label: '기술적 과제 분석' }
       ]
     }]);
   }, [ideas]);
@@ -79,32 +79,32 @@ const IdeaChatbot = ({ ideas, onClose }) => {
       let nextOptions = [];
       if (option === 'implementation') {
         nextOptions = [
-          { id: 'tech-stack', label: '이제 기술 스택을 선택하고 싶어요', emoji: '🛠️' },
-          { id: 'timeline', label: '개발 일정을 조정하고 싶어요', emoji: '📅' },
-          { id: 'team', label: '팀 구성에 대해 알고 싶어요', emoji: '👥' }
+          { id: 'tech-stack', label: '이제 기술 스택을 선택하고 싶어요' },
+          { id: 'timeline', label: '개발 일정을 조정하고 싶어요' },
+          { id: 'team', label: '팀 구성에 대해 알고 싶어요' }
         ];
       } else if (option === 'tech-stack') {
         nextOptions = [
-          { id: 'architecture', label: '아키텍처를 설계하고 싶어요', emoji: '🏗️' },
-          { id: 'alternatives', label: '다른 기술 스택도 보고 싶어요', emoji: '🔄' },
-          { id: 'learning', label: '학습 리소스를 추천받고 싶어요', emoji: '📚' }
+          { id: 'architecture', label: '아키텍처를 설계하고 싶어요' },
+          { id: 'alternatives', label: '다른 기술 스택도 보고 싶어요' },
+          { id: 'learning', label: '학습 리소스를 추천받고 싶어요' }
         ];
       } else if (option === 'architecture') {
         nextOptions = [
-          { id: 'database', label: '데이터베이스 설계를 도와주세요', emoji: '💾' },
-          { id: 'api', label: 'API 설계를 구체화하고 싶어요', emoji: '🔌' },
-          { id: 'security', label: '보안 고려사항을 알고 싶어요', emoji: '🔒' }
+          { id: 'database', label: '데이터베이스 설계를 도와주세요' },
+          { id: 'api', label: 'API 설계를 구체화하고 싶어요' },
+          { id: 'security', label: '보안 고려사항을 알고 싶어요' }
         ];
       } else if (option === 'mvp') {
         nextOptions = [
-          { id: 'features', label: '추가할 기능을 논의하고 싶어요', emoji: '✨' },
-          { id: 'marketing', label: '출시 전략을 세우고 싶어요', emoji: '📢' },
-          { id: 'metrics', label: '성공 지표를 정하고 싶어요', emoji: '📊' }
+          { id: 'features', label: '추가할 기능을 논의하고 싶어요' },
+          { id: 'marketing', label: '출시 전략을 세우고 싶어요' },
+          { id: 'metrics', label: '성공 지표를 정하고 싶어요' }
         ];
       } else {
         nextOptions = [
-          { id: 'implementation', label: '다시 구현 계획으로', emoji: '📋' },
-          { id: 'custom', label: '직접 질문하기', emoji: '✍️' }
+          { id: 'implementation', label: '다시 구현 계획으로' },
+          { id: 'custom', label: '직접 질문하기' }
         ];
       }
 
@@ -149,10 +149,10 @@ const IdeaChatbot = ({ ideas, onClose }) => {
 
       // Always show options after free-form question
       const generalOptions = [
-        { id: 'implementation', label: '구현 계획 보기', emoji: '📋' },
-        { id: 'tech-stack', label: '기술 스택 추천', emoji: '🛠️' },
-        { id: 'architecture', label: '아키텍처 설계', emoji: '🏗️' },
-        { id: 'custom', label: '계속 질문하기', emoji: '✍️' }
+        { id: 'implementation', label: '구현 계획 보기' },
+        { id: 'tech-stack', label: '기술 스택 추천' },
+        { id: 'architecture', label: '아키텍처 설계' },
+        { id: 'custom', label: '계속 질문하기' }
       ];
 
       setMessages(prev => [...prev, {
@@ -184,8 +184,8 @@ const IdeaChatbot = ({ ideas, onClose }) => {
     <div className="chatbot-overlay" onClick={onClose}>
       <div className="chatbot-container" onClick={(e) => e.stopPropagation()}>
         <div className="chatbot-header">
-          <div>
-            <h3>AI 아이디어 컨설팅</h3>
+          <div className="chatbot-header-content">
+            <img src="/pigeon-logo.png" alt="logo" className="chatbot-logo" />
             <p className="chatbot-subtitle">{ideas.length}개 프로젝트 분석중</p>
           </div>
           <button className="chatbot-close" onClick={onClose}>✕</button>
@@ -195,9 +195,6 @@ const IdeaChatbot = ({ ideas, onClose }) => {
           {messages.map((message, index) => (
             <div key={index}>
               <div className={`message ${message.role}`}>
-                <div className="message-avatar">
-                  {message.role === 'user' ? '👤' : '🤖'}
-                </div>
                 <div className="message-content">
                   {message.role === 'assistant' ? (
                     <ReactMarkdown>{message.content}</ReactMarkdown>
@@ -220,7 +217,6 @@ const IdeaChatbot = ({ ideas, onClose }) => {
                       className="option-button"
                       onClick={() => handleOptionSelect(option.id, option.label)}
                     >
-                      <span className="option-emoji">{option.emoji}</span>
                       <span className="option-label">{option.label}</span>
                     </button>
                   ))}
@@ -230,7 +226,6 @@ const IdeaChatbot = ({ ideas, onClose }) => {
           ))}
           {loading && (
             <div className="message assistant">
-              <div className="message-avatar">🤖</div>
               <div className="message-content">
                 <div className="typing-indicator">
                   <span></span>
@@ -257,7 +252,7 @@ const IdeaChatbot = ({ ideas, onClose }) => {
             disabled={loading || !input.trim()}
             className="send-button"
           >
-            {loading ? '⏳' : '➤'}
+            전송
           </button>
         </div>
       </div>

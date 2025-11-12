@@ -17,6 +17,7 @@ function Home() {
   const [selectedDevType, setSelectedDevType] = useState('');
   const [availableTechStacks, setAvailableTechStacks] = useState([]);
   const [selectedTechStacks, setSelectedTechStacks] = useState([]);
+  const [customTechStacks, setCustomTechStacks] = useState([]);
   const [days, setDays] = useState(7);
 
   // Results
@@ -74,6 +75,7 @@ function Home() {
       const response = await ideasAPI.getTechStacks(devType);
       setAvailableTechStacks(response.data.data);
       setSelectedTechStacks([]); // Reset selection
+      setCustomTechStacks([]); // Reset custom stacks
       setTechError('');
     } catch (err) {
       console.error('Error loading tech stacks:', err);
@@ -96,6 +98,10 @@ function Home() {
     });
     setError('');
     setTechError('');
+  };
+
+  const handleCustomStacksChange = (customStacks) => {
+    setCustomTechStacks(customStacks);
   };
 
   const handleNextStep = () => {
@@ -138,9 +144,17 @@ function Home() {
     await new Promise(resolve => setTimeout(resolve, 300));
 
     try {
+      // Build tech stacks array including custom stack names
+      const allTechStacks = selectedTechStacks.map(id => {
+        const standardStack = availableTechStacks.find(s => s.id === id);
+        if (standardStack) return id;
+        const customStack = customTechStacks.find(s => s.id === id);
+        return customStack ? customStack.name : id;
+      });
+
       const response = await ideasAPI.generateIdeas({
         devType: selectedDevType,
-        techStacks: selectedTechStacks,
+        techStacks: allTechStacks,
         days
       });
 
@@ -205,6 +219,7 @@ function Home() {
     setCurrentStep(1);
     setSelectedDevType('');
     setSelectedTechStacks([]);
+    setCustomTechStacks([]);
     setIdeas([]);
     setTrends(null);
     setError('');
@@ -229,18 +244,14 @@ function Home() {
       <div className="container">
         <header className="header">
           <div className="header-content">
-            <h1>Open Source Project Idea Generator</h1>
-            <p>개발자 맞춤형 오픈소스 프로젝트 아이디어를 AI가 찾아드립니다</p>
+            <img
+              src="/pigeon-logo.png"
+              alt="Pigeon"
+              className="logo logo-clickable"
+              onClick={handleReset}
+              style={{ cursor: 'pointer' }}
+            />
           </div>
-          <button
-            className="saved-ideas-button"
-            onClick={() => {
-              setShowSavedIdeas(true);
-              updateSavedIdeasCount();
-            }}
-          >
-            저장된 아이디어 {savedIdeasCount > 0 && `(${savedIdeasCount})`}
-          </button>
         </header>
 
         {showSavedIdeas && (
@@ -255,7 +266,7 @@ function Home() {
         <div className="results-section">
           {trends && trends.topics && trends.topics.length > 0 && (
             <div className="trends-section">
-              <h2>🔥 트렌딩 토픽</h2>
+              <h2>트렌딩 토픽</h2>
               <div className="topics-grid">
                 {trends.topics.slice(0, 8).map(([topic, count]) => (
                   <div key={topic} className="topic-tag">
@@ -272,20 +283,161 @@ function Home() {
             <p className="ideas-count">총 {ideas.length}개의 아이디어</p>
           </div>
 
+          {/* Filter Section */}
+          <div className="filter-section">
+            <div className="filter-row-top">
+              <div className="filter-group">
+                <label className="filter-label">개발자 유형</label>
+                <select
+                  value={selectedDevType}
+                  onChange={(e) => setSelectedDevType(e.target.value)}
+                  className="filter-select"
+                >
+                  {developerTypes.map(type => (
+                    <option key={type.id} value={type.id}>
+                      {type.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="filter-group filter-group-period">
+                <label className="filter-label">분석 기간</label>
+                <select
+                  value={days}
+                  onChange={(e) => setDays(Number(e.target.value))}
+                  className="filter-select"
+                >
+                  <option value={7}>최근 7일</option>
+                  <option value={14}>최근 14일</option>
+                  <option value={30}>최근 30일</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="filter-row-middle">
+              <div className="filter-group filter-group-full">
+                <label className="filter-label">기술 스택</label>
+                <div className="tech-stack-chips">
+                  {availableTechStacks.map(stack => (
+                    <button
+                      key={stack.id}
+                      onClick={() => handleTechStackToggle(stack.id)}
+                      className={`tech-chip ${selectedTechStacks.includes(stack.id) ? 'selected' : ''}`}
+                    >
+                      {stack.name}
+                    </button>
+                  ))}
+                  {customTechStacks.map(stack => (
+                    <button
+                      key={stack.id}
+                      onClick={() => handleTechStackToggle(stack.id)}
+                      className={`tech-chip ${selectedTechStacks.includes(stack.id) ? 'selected' : ''}`}
+                    >
+                      {stack.name}
+                    </button>
+                  ))}
+                  <button
+                    className="tech-chip tech-chip-add"
+                    onClick={() => {
+                      const input = document.getElementById('filter-custom-stack-input');
+                      if (input) {
+                        input.style.display = input.style.display === 'none' ? 'inline-block' : 'none';
+                        if (input.style.display !== 'none') input.focus();
+                      }
+                    }}
+                  >
+                    + 기타
+                  </button>
+                  <input
+                    id="filter-custom-stack-input"
+                    type="text"
+                    placeholder="기술 스택 입력 후 Enter"
+                    className="filter-custom-stack-input"
+                    style={{ display: 'none' }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && e.target.value.trim()) {
+                        const customId = `custom-${Date.now()}`;
+                        const newStack = { id: customId, name: e.target.value.trim() };
+                        const updatedCustomStacks = [...customTechStacks, newStack];
+                        setCustomTechStacks(updatedCustomStacks);
+                        handleTechStackToggle(customId);
+                        e.target.value = '';
+                        e.target.style.display = 'none';
+                      }
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="filter-row-bottom">
+              <button
+                onClick={handleGenerateIdeas}
+                disabled={loading || selectedTechStacks.length === 0}
+                className="filter-generate-btn"
+              >
+                {loading ? '생성 중...' : '아이디어 다시 생성'}
+              </button>
+            </div>
+          </div>
+
+          {/* Saved Ideas Button - Independent */}
+          <div className="saved-ideas-section">
+            <button
+              className="saved-ideas-btn"
+              onClick={() => {
+                setShowSavedIdeas(true);
+                updateSavedIdeasCount();
+              }}
+            >
+              <div className="saved-ideas-header-info">
+                <span className="saved-ideas-title">저장된 아이디어</span>
+                {savedIdeasCount > 0 && <span className="saved-ideas-count">{savedIdeasCount}개</span>}
+              </div>
+              {savedIdeasCount > 0 && (
+                <div className="saved-ideas-list-preview">
+                  {getSavedIdeas().slice(0, 3).map((idea, index) => {
+                    const title = idea['Project Name'] || idea.title || '제목 없음';
+                    const devTypeLabel = developerTypes.find(t => t.id === selectedDevType)?.label || '';
+
+                    return (
+                      <div key={index} className="saved-idea-preview-item">
+                        <span className="preview-bullet">•</span>
+                        <span className="preview-idea-title">{title}</span>
+                      </div>
+                    );
+                  })}
+                  {savedIdeasCount > 3 && (
+                    <div className="saved-idea-preview-more">
+                      외 {savedIdeasCount - 3}개
+                    </div>
+                  )}
+                </div>
+              )}
+            </button>
+          </div>
+
           <div className="ideas-grid">
             {ideas.map((idea, index) => (
               <IdeaCard
                 key={index}
                 idea={idea}
                 onRefine={handleRefineIdea}
+                onSaveChange={updateSavedIdeasCount}
+                metadata={{
+                  devType: selectedDevType,
+                  devTypeLabel: developerTypes.find(t => t.id === selectedDevType)?.label || '',
+                  days: days,
+                  techStacks: selectedTechStacks.map(id => {
+                    const standardStack = availableTechStacks.find(s => s.id === id);
+                    if (standardStack) return standardStack.name;
+                    const customStack = customTechStacks.find(s => s.id === id);
+                    return customStack ? customStack.name : '';
+                  }).filter(name => name)
+                }}
               />
             ))}
-          </div>
-
-          <div className="wizard-actions">
-            <button onClick={handleReset} className="btn btn-secondary">
-              ← 새로운 아이디어 생성
-            </button>
           </div>
         </div>
       </div>
@@ -297,28 +449,15 @@ function Home() {
     <div className="container">
       <header className="header">
         <div className="header-content">
-          <h1>Open Source Project Idea Generator</h1>
-          <p>개발자 맞춤형 오픈소스 프로젝트 아이디어를 AI가 찾아드립니다</p>
+          <img
+            src="/pigeon-logo.png"
+            alt="Pigeon"
+            className="logo logo-clickable"
+            onClick={handleReset}
+            style={{ cursor: 'pointer' }}
+          />
         </div>
-        <button
-          className="saved-ideas-button"
-          onClick={() => {
-            setShowSavedIdeas(true);
-            updateSavedIdeasCount();
-          }}
-        >
-          💾 저장된 아이디어 {savedIdeasCount > 0 && `(${savedIdeasCount})`}
-        </button>
       </header>
-
-      {showSavedIdeas && (
-        <SavedIdeas
-          onClose={() => {
-            setShowSavedIdeas(false);
-            updateSavedIdeasCount();
-          }}
-        />
-      )}
 
       <WizardSteps currentStep={currentStep} steps={wizardSteps} />
 
@@ -358,6 +497,7 @@ function Home() {
             onStackToggle={handleTechStackToggle}
             devType={selectedDevType}
             error={techError}
+            onCustomStacksChange={handleCustomStacksChange}
           />
         )}
 
@@ -392,9 +532,12 @@ function Home() {
               <div className="summary-item">
                 <span className="label">기술 스택:</span>
                 <span className="value">
-                  {selectedTechStacks.map(id =>
-                    availableTechStacks.find(s => s.id === id)?.name
-                  ).join(', ')}
+                  {selectedTechStacks.map(id => {
+                    const standardStack = availableTechStacks.find(s => s.id === id);
+                    if (standardStack) return standardStack.name;
+                    const customStack = customTechStacks.find(s => s.id === id);
+                    return customStack ? customStack.name : '';
+                  }).filter(name => name).join(', ')}
                 </span>
               </div>
               <div className="summary-item">

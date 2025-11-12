@@ -17,17 +17,24 @@ export const getSavedIdeas = () => {
 /**
  * Save an idea to localStorage
  * @param {Object} idea - The idea object to save
+ * @param {Object} metadata - Additional metadata (devType, days, techStacks)
  * @returns {boolean} Success status
  */
-export const saveIdea = (idea) => {
+export const saveIdea = (idea, metadata = {}) => {
   try {
     const saved = getSavedIdeas();
 
-    // Add timestamp and unique ID
+    // Add timestamp, unique ID, and metadata
     const ideaWithMeta = {
       ...idea,
       savedAt: new Date().toISOString(),
-      savedId: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      savedId: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      metadata: {
+        devType: metadata.devType || '',
+        devTypeLabel: metadata.devTypeLabel || '',
+        days: metadata.days || 7,
+        techStacks: metadata.techStacks || []
+      }
     };
 
     // Check if already saved (by project name)
