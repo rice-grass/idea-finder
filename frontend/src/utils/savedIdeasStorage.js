@@ -17,7 +17,7 @@ export const getSavedIdeas = () => {
 /**
  * Save an idea to localStorage
  * @param {Object} idea - The idea object to save
- * @param {Object} metadata - Additional metadata (devType, days, techStacks)
+ * @param {Object} metadata - Additional metadata (studentLevel, devType, days, techStacks)
  * @returns {boolean} Success status
  */
 export const saveIdea = (idea, metadata = {}) => {
@@ -30,6 +30,8 @@ export const saveIdea = (idea, metadata = {}) => {
       savedAt: new Date().toISOString(),
       savedId: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       metadata: {
+        studentLevel: metadata.studentLevel || '',
+        studentLevelLabel: metadata.studentLevelLabel || '',
         devType: metadata.devType || '',
         devTypeLabel: metadata.devTypeLabel || '',
         days: metadata.days || 7,

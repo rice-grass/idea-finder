@@ -156,18 +156,24 @@ const SavedIdeas = ({ onClose }) => {
                 >
                   {idea.metadata && (
                     <div className="saved-idea-header">
+                      {idea.metadata.studentLevelLabel && (
+                        <span className="metadata-text">{idea.metadata.studentLevelLabel}</span>
+                      )}
                       {idea.metadata.devTypeLabel && (
-                        <span className="metadata-text">{idea.metadata.devTypeLabel}</span>
+                        <>
+                          {idea.metadata.studentLevelLabel && <span className="metadata-dot">•</span>}
+                          <span className="metadata-text">{idea.metadata.devTypeLabel}</span>
+                        </>
                       )}
                       {idea.metadata.days && (
                         <>
-                          {idea.metadata.devTypeLabel && <span className="metadata-dot">•</span>}
+                          {(idea.metadata.studentLevelLabel || idea.metadata.devTypeLabel) && <span className="metadata-dot">•</span>}
                           <span className="metadata-text">최근 {idea.metadata.days}일</span>
                         </>
                       )}
                       {idea.metadata.techStacks && idea.metadata.techStacks.length > 0 && (
                         <>
-                          {(idea.metadata.devTypeLabel || idea.metadata.days) && <span className="metadata-dot">•</span>}
+                          {(idea.metadata.studentLevelLabel || idea.metadata.devTypeLabel || idea.metadata.days) && <span className="metadata-dot">•</span>}
                           <span className="metadata-text">
                             {idea.metadata.techStacks.slice(0, 2).join(', ')}
                             {idea.metadata.techStacks.length > 2 && ` 외 ${idea.metadata.techStacks.length - 2}개`}

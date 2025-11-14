@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ideasAPI } from '../services/api';
 import WizardSteps from '../components/WizardSteps';
+import StudentLevelSelector from '../components/StudentLevelSelector';
 import DeveloperTypeSelector from '../components/DeveloperTypeSelector';
 import TechStackSelector from '../components/TechStackSelector';
 import IdeaCard from '../components/IdeaCard';
@@ -10,9 +11,11 @@ import { getSavedIdeas } from '../utils/savedIdeasStorage';
 function Home() {
   // Wizard state
   const [currentStep, setCurrentStep] = useState(1);
-  const wizardSteps = ['개발자 유형 선택', '기술 스택 선택', '아이디어 생성'];
+  const wizardSteps = ['학생 신분 선택', '개발자 유형 선택', '기술 스택 선택', '아이디어 생성'];
 
   // Form data
+  const [studentLevels, setStudentLevels] = useState([]);
+  const [selectedStudentLevel, setSelectedStudentLevel] = useState('');
   const [developerTypes, setDeveloperTypes] = useState([]);
   const [selectedDevType, setSelectedDevType] = useState('');
   const [availableTechStacks, setAvailableTechStacks] = useState([]);
@@ -34,8 +37,9 @@ function Home() {
   // Page transition state
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // Load developer types on mount
+  // Load student levels and developer types on mount
   useEffect(() => {
+    loadStudentLevels();
     loadDeveloperTypes();
     updateSavedIdeasCount();
   }, []);
@@ -52,6 +56,19 @@ function Home() {
       loadTechStacks(selectedDevType);
     }
   }, [selectedDevType]);
+
+  const loadStudentLevels = async () => {
+    try {
+      console.log('🔄 Loading student levels...');
+      const response = await ideasAPI.getStudentLevels();
+      console.log('✅ Student levels loaded:', response.data.data);
+      setStudentLevels(response.data.data);
+      setError('');
+    } catch (err) {
+      console.error('❌ Error loading student levels:', err);
+      setError(`학생 레벨을 불러올 수 없습니다. ${err.message}`);
+    }
+  };
 
   const loadDeveloperTypes = async () => {
     setLoading(true);
@@ -105,21 +122,27 @@ function Home() {
   };
 
   const handleNextStep = () => {
-    // Validation
-    if (currentStep === 1 && !selectedDevType) {
+    // Step 1: 학생 신분 선택
+    if (currentStep === 1 && !selectedStudentLevel) {
+      setError('학생 신분을 선택해주세요.');
+      return;
+    }
+
+    // Step 2: 개발자 유형 선택
+    if (currentStep === 2 && !selectedDevType) {
       setError('개발자 유형을 선택해주세요.');
       return;
     }
 
-    if (currentStep === 2 && selectedTechStacks.length === 0) {
-      // Show a local, inline error for tech stack selection rather than the global error banner.
+    // Step 3: 기술 스택 선택
+    if (currentStep === 3 && selectedTechStacks.length === 0) {
       setTechError('최소 1개 이상의 기술 스택을 선택해주세요.');
       return;
     }
 
     setError('');
 
-    if (currentStep < 3) {
+    if (currentStep < 4) {
       setCurrentStep(prev => prev + 1);
     } else {
       handleGenerateIdeas();
@@ -155,7 +178,8 @@ function Home() {
       const response = await ideasAPI.generateIdeas({
         devType: selectedDevType,
         techStacks: allTechStacks,
-        days
+        days,
+        studentLevel: selectedStudentLevel
       });
 
       const data = response.data.data;
@@ -191,7 +215,8 @@ function Home() {
     try {
       const response = await ideasAPI.refineIdea(originalIdea, refinementType, {
         devType: selectedDevType,
-        techStacks: selectedTechStacks
+        techStacks: selectedTechStacks,
+        studentLevel: selectedStudentLevel
       });
 
       const refinedIdeas = response.data.data.ideas;
@@ -217,6 +242,7 @@ function Home() {
 
   const handleReset = () => {
     setCurrentStep(1);
+    setSelectedStudentLevel('');
     setSelectedDevType('');
     setSelectedTechStacks([]);
     setCustomTechStacks([]);
@@ -426,6 +452,8 @@ function Home() {
                 onRefine={handleRefineIdea}
                 onSaveChange={updateSavedIdeasCount}
                 metadata={{
+                  studentLevel: selectedStudentLevel,
+                  studentLevelLabel: studentLevels.find(l => l.id === selectedStudentLevel)?.label || '',
                   devType: selectedDevType,
                   devTypeLabel: developerTypes.find(t => t.id === selectedDevType)?.label || '',
                   days: days,
@@ -468,8 +496,29 @@ function Home() {
       )}
 
       <div className={`wizard-content ${isTransitioning ? 'exiting' : ''}`}>
-        {/* Step 1: Developer Type Selection */}
+        {/* Step 1: Student Level Selection */}
         {currentStep === 1 && (
+          loading && studentLevels.length === 0 ? (
+            <div className="loading-container">
+              <div className="loader"></div>
+              <p>학생 신분 옵션을 불러오는 중...</p>
+            </div>
+          ) : error && !loading ? (
+            <div className="error-state">
+              <p>{error}</p>
+              <button onClick={loadStudentLevels} className="btn btn-primary">다시 시도</button>
+            </div>
+          ) : (
+            <StudentLevelSelector
+              selectedLevel={selectedStudentLevel}
+              onLevelSelect={setSelectedStudentLevel}
+              studentLevels={studentLevels}
+            />
+          )
+        )}
+
+        {/* Step 2: Developer Type Selection */}
+        {currentStep === 2 && (
           loading && developerTypes.length === 0 ? (
             <div className="loading-container">
               <div className="loader"></div>
@@ -489,8 +538,8 @@ function Home() {
           )
         )}
 
-        {/* Step 2: Tech Stack Selection */}
-        {currentStep === 2 && (
+        {/* Step 3: Tech Stack Selection */}
+        {currentStep === 3 && (
           <TechStackSelector
             techStacks={availableTechStacks}
             selectedStacks={selectedTechStacks}
@@ -501,8 +550,8 @@ function Home() {
           />
         )}
 
-        {/* Step 3: Generate Ideas */}
-        {currentStep === 3 && (
+        {/* Step 4: Generate Ideas */}
+        {currentStep === 4 && (
           <div className="generate-section">
             <h2>아이디어 생성 설정</h2>
             <p className="subtitle">GitHub에서 최근 몇 일의 데이터를 분석할까요?</p>
@@ -523,6 +572,12 @@ function Home() {
 
             <div className="summary-box">
               <h3>선택 요약</h3>
+              <div className="summary-item">
+                <span className="label">학생 신분:</span>
+                <span className="value">
+                  {studentLevels.find(l => l.id === selectedStudentLevel)?.label}
+                </span>
+              </div>
               <div className="summary-item">
                 <span className="label">개발자 유형:</span>
                 <span className="value">
@@ -557,13 +612,13 @@ function Home() {
           </button>
         )}
 
-        {currentStep < 3 && (
+        {currentStep < 4 && (
           <button onClick={handleNextStep} className="btn btn-primary">
             다음
           </button>
         )}
 
-        {currentStep === 3 && ideas.length === 0 && (
+        {currentStep === 4 && ideas.length === 0 && (
           <button
             onClick={handleGenerateIdeas}
             disabled={loading}

@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import { getStudentLevel, getDifficultyForLevel } from '../config/studentLevels.js';
 
 class OpenAIService {
   constructor() {
@@ -20,12 +21,12 @@ class OpenAIService {
   /**
    * Generate project ideas based on GitHub trends
    * @param {Object} trends - Analyzed GitHub trends
-   * @param {Object} context - Additional context (devType, techStacks, gapAnalysis)
+   * @param {Object} context - Additional context (devType, techStacks, gapAnalysis, studentLevel)
    */
   async generateIdeas(trends, context = {}) {
     try {
       const prompt = this.buildPrompt(trends, context);
-      const systemPrompt = this.buildSystemPrompt(context.devType);
+      const systemPrompt = this.buildSystemPrompt(context.devType, context.studentLevel);
 
       const completion = await this.openai.chat.completions.create({
         model: "gpt-3.5-turbo",
@@ -54,12 +55,12 @@ class OpenAIService {
    * Refine or generate variations of an existing idea
    * @param {Object} originalIdea - The original idea to refine
    * @param {string} refinementType - Type of refinement (similar, easier, harder, focus)
-   * @param {Object} context - Additional context (devType, techStacks)
+   * @param {Object} context - Additional context (devType, techStacks, studentLevel)
    */
   async refineIdea(originalIdea, refinementType, context = {}) {
     try {
       const prompt = this.buildRefinePrompt(originalIdea, refinementType, context);
-      const systemPrompt = this.buildSystemPrompt(context.devType);
+      const systemPrompt = this.buildSystemPrompt(context.devType, context.studentLevel);
 
       const completion = await this.openai.chat.completions.create({
         model: "gpt-3.5-turbo",
@@ -85,11 +86,19 @@ class OpenAIService {
   }
 
   /**
-   * Build system prompt based on developer type
+   * Build system prompt based on developer type and student level
    * @param {string} devType - Developer type (frontend, backend, fullstack)
+   * @param {string} studentLevel - Student level (elementary, middle, high, university)
    */
-  buildSystemPrompt(devType) {
+  buildSystemPrompt(devType, studentLevel = 'university') {
     const basePrompt = "당신은 시장 격차를 식별하고 혁신적인 오픈소스 프로젝트 아이디어를 생성하는 전문 소프트웨어 엔지니어입니다. 모든 응답은 한국어로 작성해야 합니다.";
+
+    const levelPrompts = {
+      elementary: "초등학생을 위한 아이디어를 생성합니다. Scratch, 블록 코딩, 간단한 게임 개발 등 비주얼 프로그래밍 도구를 활용하고, 개념을 쉽게 설명하세요. 복잡한 알고리즘이나 데이터베이스는 피하고, 재미있고 직관적인 프로젝트를 제안하세요.",
+      middle: "중학생을 위한 아이디어를 생성합니다. HTML/CSS/JavaScript, Python 기초 등을 활용한 간단한 웹 페이지나 앱 개발에 초점을 맞추세요. 기본적인 변수, 조건문, 반복문 수준으로 제한하고, 시각적으로 흥미로운 결과물을 만들 수 있도록 하세요.",
+      high: "고등학생을 위한 아이디어를 생성합니다. React, Node.js, Python/Flask 등을 활용한 풀스택 프로젝트로 포트폴리오에 활용 가능해야 합니다. API 연동, 데이터베이스 사용, 배포까지 포함하여 대학 입시나 대회용으로 적합한 프로젝트를 제안하세요.",
+      university: "대학생 및 취업 준비생을 위한 아이디어를 생성합니다. 고급 프레임워크, 마이크로서비스, CI/CD, 테스팅, 보안 등을 포함한 산업 수준의 프로젝트를 제안하세요. 실무 경험을 보여줄 수 있고 취업 포트폴리오로 활용 가능해야 합니다."
+    };
 
     const typeSpecificPrompts = {
       frontend: "프론트엔드 개발, UI/UX 디자인, 사용자 경험 개선에 대한 깊은 전문성을 보유하고 있습니다. 클라이언트 측 애플리케이션, 컴포넌트 라이브러리, 프론트엔드 개발자를 위한 도구에 중점을 둡니다.",
@@ -97,7 +106,10 @@ class OpenAIService {
       fullstack: "프론트엔드와 백엔드 개발 모두에 대한 포괄적인 전문성을 보유하고 있으며, 엔드투엔드 솔루션에 중점을 둡니다. 풀스택 역량을 보여주는 완전한 애플리케이션에 집중합니다."
     };
 
-    return `${basePrompt} ${typeSpecificPrompts[devType] || typeSpecificPrompts.fullstack}`;
+    const levelGuidance = levelPrompts[studentLevel] || levelPrompts.university;
+    const typeGuidance = typeSpecificPrompts[devType] || typeSpecificPrompts.fullstack;
+
+    return `${basePrompt} ${levelGuidance} ${typeGuidance}`;
   }
 
   /**
@@ -110,12 +122,24 @@ class OpenAIService {
     const topLanguages = trends.languages.slice(0, 3).map(([lang]) => lang).join(', ');
     const topKeywords = trends.keywords.slice(0, 10).map(([keyword]) => keyword).join(', ');
 
+    // Get student level configuration
+    const studentLevel = context.studentLevel || 'university';
+    const levelConfig = getStudentLevel(studentLevel);
+
     let prompt = `현재 GitHub 트렌드를 기반으로 다음 데이터를 발견했습니다:
 
 📊 인기 주제: ${topTopics}
 💻 인기 언어: ${topLanguages}
 🔑 주요 키워드: ${topKeywords}
 `;
+
+    // Add student level context
+    if (levelConfig) {
+      prompt += `\n🎓 학생 수준: ${levelConfig.label} (${levelConfig.description})`;
+      prompt += `\n📅 추천 개발 기간: ${levelConfig.recommendedTime}`;
+      prompt += `\n⚙️ 복잡도: ${levelConfig.complexity}`;
+      prompt += `\n✨ 최대 핵심 기능: ${levelConfig.maxFeatures}개`;
+    }
 
     // Add developer type context
     if (context.devType) {
@@ -146,7 +170,7 @@ class OpenAIService {
 
 ## 요청사항
 
-위 트렌드를 분석하여 다음 조건을 만족하는 **3개의 혁신적인 오픈소스 프로젝트 아이디어**를 제안해주세요:
+위 트렌드를 분석하여 **${levelConfig ? levelConfig.label : ''}를 위한** 다음 조건을 만족하는 **3개의 혁신적인 오픈소스 프로젝트 아이디어**를 제안해주세요:
 
 ### 필수 조건
 1. 현재 생태계의 **구체적인 격차**를 채움 (수요는 높지만 공급이 적은 영역에 집중)
@@ -170,8 +194,8 @@ class OpenAIService {
 
 **실행 계획:**
 - **Implementation Plan**: 3-4단계의 고수준 구현 계획 (각 단계는 구체적인 행동으로)
-- **Estimated Time**: 예상 개발 시간 (예: "2-3주", "1개월", "2-3개월")
-- **Difficulty Level**: 난이도 ("초급", "중급", "고급" 중 하나)
+- **Estimated Time**: 반드시 "${levelConfig ? levelConfig.recommendedTime : '8-12주'}" 범위로 설정
+- **Difficulty Level**: 반드시 "${levelConfig ? levelConfig.difficultyLevel : 'Intermediate-Advanced'}"로 설정
 
 **기술 세부사항:**
 - **Required Libraries**: 필요한 3-5개의 핵심 라이브러리/도구 (구체적인 패키지명)
@@ -226,38 +250,46 @@ class OpenAIService {
     const techStack = originalIdea['Tech Stack'] || '';
     const difficulty = originalIdea['Difficulty Level'] || '';
 
+    // Get student level configuration
+    const studentLevel = context.studentLevel || 'university';
+    const levelConfig = getStudentLevel(studentLevel);
+
     const refinementInstructions = {
       similar: `다음 프로젝트와 비슷하지만 다른 각도에서 접근하는 새로운 아이디어를 1개 생성해주세요:
 
 프로젝트: ${projectName}
 설명: ${description}
 기술 스택: ${techStack}
+학생 수준: ${levelConfig ? levelConfig.label : '대학생'}
 
-비슷한 문제 영역을 다루지만, 다른 사용자층이나 다른 구현 방식으로 접근하는 아이디어를 제안해주세요.`,
+비슷한 문제 영역을 다루지만, 다른 사용자층이나 다른 구현 방식으로 접근하는 아이디어를 제안해주세요. ${levelConfig ? levelConfig.label : ''}에게 적합한 난이도와 범위로 제한하세요.`,
 
-      easier: `다음 프로젝트를 초보자도 쉽게 구현할 수 있도록 단순화한 버전을 1개 생성해주세요:
+      easier: `다음 프로젝트를 ${levelConfig ? levelConfig.label : '초보자'}도 쉽게 구현할 수 있도록 단순화한 버전을 1개 생성해주세요:
 
 프로젝트: ${projectName}
 설명: ${description}
 현재 난이도: ${difficulty}
+목표 학생 수준: ${levelConfig ? levelConfig.label : '초등학생'}
 
-핵심 기능은 유지하되, 구현 난이도를 낮추고 필요한 기술을 줄인 버전을 제안해주세요. 난이도는 "초급" 또는 "중급"이어야 합니다.`,
+핵심 기능은 유지하되, 구현 난이도를 낮추고 필요한 기술을 줄인 버전을 제안해주세요. 난이도는 "${levelConfig ? levelConfig.difficultyLevel : 'Beginner'}"이어야 합니다.`,
 
       harder: `다음 프로젝트를 더 고급 개발자를 위한 챌린징한 버전으로 확장한 아이디어를 1개 생성해주세요:
 
 프로젝트: ${projectName}
 설명: ${description}
 현재 난이도: ${difficulty}
+목표 학생 수준: ${levelConfig ? levelConfig.label : '대학생'}
 
-더 복잡한 기능, 확장성, 성능 최적화, 고급 아키텍처 패턴을 포함한 버전을 제안해주세요. 난이도는 "고급"이어야 합니다.`,
+더 복잡한 기능, 확장성, 성능 최적화, 고급 아키텍처 패턴을 포함한 버전을 제안해주세요. 난이도는 "${levelConfig ? levelConfig.difficultyLevel : 'Advanced'}"이어야 합니다.`,
 
       focus: `다음 프로젝트의 핵심 기능 중 하나에 집중한 전문화된 버전을 1개 생성해주세요:
 
 프로젝트: ${projectName}
 설명: ${description}
 기술 스택: ${techStack}
+학생 수준: ${levelConfig ? levelConfig.label : '대학생'}
 
-프로젝트의 특정 기능이나 측면을 깊이 있게 파고드는 전문화된 도구나 라이브러리 아이디어를 제안해주세요.`
+프로젝트의 특정 기능이나 측면을 깊이 있게 파고드는 전문화된 도구나 라이브러리 아이디어를 제안해주세요. ${levelConfig ? levelConfig.label : ''}에게 적합한 수준으로 제안하세요.`
     };
 
     const instruction = refinementInstructions[refinementType] || refinementInstructions.similar;
@@ -265,6 +297,7 @@ class OpenAIService {
     let prompt = `${instruction}
 
 ${context.techStacks && context.techStacks.length > 0 ? `선호하는 기술 스택: ${context.techStacks.join(', ')}` : ''}
+${levelConfig ? `\n추천 개발 기간: ${levelConfig.recommendedTime}\n최대 핵심 기능: ${levelConfig.maxFeatures}개` : ''}
 
 다음 JSON 형식으로 정확히 1개의 아이디어를 생성해주세요:
 

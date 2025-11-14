@@ -7,8 +7,28 @@ import {
   createSearchQuery,
   filterAndScoreRepos
 } from '../services/developerProfileService.js';
+import { getStudentLevels } from '../config/studentLevels.js';
 
 const router = express.Router();
+
+/**
+ * GET /api/ideas/student-levels
+ * Get all available student levels
+ */
+router.get('/student-levels', (req, res) => {
+  try {
+    const levels = getStudentLevels();
+    res.json({
+      success: true,
+      data: levels
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
 
 /**
  * GET /api/ideas/developer-types
@@ -56,7 +76,7 @@ router.get('/tech-stacks/:devType', (req, res) => {
 router.post('/generate', async (req, res) => {
   console.log('📥 [API] Received generate ideas request:', req.body);
   try {
-    const { language, days, devType, techStacks } = req.body;
+    const { language, days, devType, techStacks, studentLevel } = req.body;
 
     let repos;
     let gapAnalysis = null;
@@ -95,7 +115,8 @@ router.post('/generate', async (req, res) => {
     const context = {
       devType,
       techStacks,
-      gapAnalysis
+      gapAnalysis,
+      studentLevel: studentLevel || 'university' // Default to university level
     };
     const ideas = await openaiService.generateIdeas(trends, context);
 
@@ -165,7 +186,7 @@ router.post('/analyze', async (req, res) => {
  */
 router.post('/refine', async (req, res) => {
   try {
-    const { idea, refinementType, devType, techStacks } = req.body;
+    const { idea, refinementType, devType, techStacks, studentLevel } = req.body;
 
     if (!idea) {
       return res.status(400).json({
@@ -183,7 +204,8 @@ router.post('/refine', async (req, res) => {
 
     const context = {
       devType: devType || 'fullstack',
-      techStacks: techStacks || []
+      techStacks: techStacks || [],
+      studentLevel: studentLevel || 'university'
     };
 
     const refinedIdeas = await openaiService.refineIdea(idea, refinementType, context);

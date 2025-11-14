@@ -33,6 +33,10 @@ export const githubAPI = {
 
 // Ideas API endpoints
 export const ideasAPI = {
+  // Get student levels
+  getStudentLevels: () =>
+    api.get('/api/ideas/student-levels'),
+
   // Get developer types
   getDeveloperTypes: () =>
     api.get('/api/ideas/developer-types'),
@@ -45,12 +49,13 @@ export const ideasAPI = {
   generateIdeas: (params = {}) => {
     // Support both old and new formats
     // Old: { language, days }
-    // New: { devType, techStacks, days }
+    // New: { devType, techStacks, days, studentLevel }
     const payload = {
       language: params.language || '',
       days: params.days || 7,
       devType: params.devType || null,
-      techStacks: params.techStacks || []
+      techStacks: params.techStacks || [],
+      studentLevel: params.studentLevel || 'university'
     };
     return api.post('/api/ideas/generate', payload);
   },
@@ -64,7 +69,8 @@ export const ideasAPI = {
       idea,
       refinementType,
       devType: context.devType || 'fullstack',
-      techStacks: context.techStacks || []
+      techStacks: context.techStacks || [],
+      studentLevel: context.studentLevel || 'university'
     }),
 
   // Chat with AI about selected ideas
