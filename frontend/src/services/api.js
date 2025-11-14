@@ -41,9 +41,11 @@ export const ideasAPI = {
   getDeveloperTypes: () =>
     api.get('/api/ideas/developer-types'),
 
-  // Get tech stacks for a developer type
-  getTechStacks: (devType) =>
-    api.get(`/api/ideas/tech-stacks/${devType}`),
+  // Get tech stacks for a developer type and student level
+  getTechStacks: (devType, studentLevel) =>
+    api.get(`/api/ideas/tech-stacks/${devType}`, {
+      params: { studentLevel }
+    }),
 
   // Generate ideas (enhanced version with developer profile)
   generateIdeas: (params = {}) => {

@@ -52,10 +52,10 @@ function Home() {
 
   // Load tech stacks when developer type changes
   useEffect(() => {
-    if (selectedDevType) {
-      loadTechStacks(selectedDevType);
+    if (selectedDevType && selectedStudentLevel) {
+      loadTechStacks(selectedDevType, selectedStudentLevel);
     }
-  }, [selectedDevType]);
+  }, [selectedDevType, selectedStudentLevel]);
 
   const loadStudentLevels = async () => {
     try {
@@ -87,9 +87,9 @@ function Home() {
     }
   };
 
-  const loadTechStacks = async (devType) => {
+  const loadTechStacks = async (devType, studentLevel) => {
     try {
-      const response = await ideasAPI.getTechStacks(devType);
+      const response = await ideasAPI.getTechStacks(devType, studentLevel);
       setAvailableTechStacks(response.data.data);
       setSelectedTechStacks([]); // Reset selection
       setCustomTechStacks([]); // Reset custom stacks

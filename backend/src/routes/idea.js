@@ -50,13 +50,14 @@ router.get('/developer-types', (req, res) => {
 });
 
 /**
- * GET /api/ideas/tech-stacks/:devType
- * Get available tech stacks for a developer type
+ * GET /api/ideas/tech-stacks/:devType?studentLevel=xxx
+ * Get available tech stacks for a developer type and student level
  */
 router.get('/tech-stacks/:devType', (req, res) => {
   try {
     const { devType } = req.params;
-    const stacks = getAvailableStacks(devType);
+    const { studentLevel } = req.query; // Get studentLevel from query parameters
+    const stacks = getAvailableStacks(devType, studentLevel);
     res.json({
       success: true,
       data: stacks
@@ -86,7 +87,7 @@ router.post('/generate', async (req, res) => {
       console.log(`👤 [Profile] Generating for ${devType} developer with stacks:`, techStacks);
 
       // Create optimized search query
-      const searchContext = createSearchQuery(devType, techStacks, days || 7);
+      const searchContext = createSearchQuery(devType, techStacks, days || 7, studentLevel);
       console.log('🔍 [Search] Query:', searchContext.query);
 
       // Get repos using custom query

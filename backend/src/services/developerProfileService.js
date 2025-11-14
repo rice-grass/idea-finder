@@ -11,20 +11,21 @@ import {
 } from '../config/techStacks.js';
 
 /**
- * 개발자 유형별 기술 스택 목록 반환
+ * 개발자 유형 및 학생 레벨별 기술 스택 목록 반환
  * @param {string} devType - 'frontend', 'backend', 'fullstack'
+ * @param {string} studentLevel - 'elementary', 'middle', 'high', 'university'
  * @returns {Array} 기술 스택 배열
  */
-function getAvailableStacks(devType) {
+function getAvailableStacks(devType, studentLevel = 'university') {
   try {
-    const stacks = getTechStacksByType(devType);
+    const stacks = getTechStacksByType(devType, studentLevel);
     return stacks.map(stack => ({
       id: stack.id,
       name: stack.name,
       description: `${stack.name} 기반 프로젝트`
     }));
   } catch (error) {
-    throw new Error(`Failed to get stacks for ${devType}: ${error.message}`);
+    throw new Error(`Failed to get stacks for ${devType} (${studentLevel}): ${error.message}`);
   }
 }
 
@@ -41,9 +42,10 @@ function getDeveloperTypes() {
  * @param {string} devType - 개발자 유형
  * @param {Array<string>} techStacks - 선택된 기술 스택 ID 배열
  * @param {number} days - 최근 며칠
+ * @param {string} studentLevel - 학생 레벨
  * @returns {Object} { query, metadata }
  */
-function createSearchQuery(devType, techStacks, days = 7) {
+function createSearchQuery(devType, techStacks, days = 7, studentLevel = 'university') {
   if (!devType) {
     throw new Error('Developer type is required');
   }
@@ -52,13 +54,14 @@ function createSearchQuery(devType, techStacks, days = 7) {
     throw new Error('At least one tech stack must be selected');
   }
 
-  const query = buildGitHubQuery(devType, techStacks, days);
-  const metadata = getStackMetadata(devType, techStacks);
+  const query = buildGitHubQuery(devType, studentLevel, techStacks, days);
+  const metadata = getStackMetadata(devType, studentLevel, techStacks);
 
   return {
     query,
     metadata,
     devType,
+    studentLevel,
     selectedStacks: techStacks
   };
 }
@@ -140,17 +143,19 @@ function filterAndScoreRepos(repos, metadata) {
  * 개발자 프로필에 맞는 추천 생성
  * @param {string} devType - 개발자 유형
  * @param {Array<string>} techStacks - 선택된 기술 스택
+ * @param {string} studentLevel - 학생 레벨
  * @returns {Object} 추천 정보
  */
-function generateRecommendations(devType, techStacks) {
-  const metadata = getStackMetadata(devType, techStacks);
-  const stackNames = getTechStacksByType(devType)
+function generateRecommendations(devType, techStacks, studentLevel = 'university') {
+  const metadata = getStackMetadata(devType, studentLevel, techStacks);
+  const stackNames = getTechStacksByType(devType, studentLevel)
     .filter(stack => techStacks.includes(stack.id))
     .map(stack => stack.name);
 
   return {
     profile: {
       devType,
+      studentLevel,
       techStacks: stackNames,
       languages: metadata.languages,
       topics: metadata.topics.slice(0, 5)
