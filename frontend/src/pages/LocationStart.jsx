@@ -35,7 +35,7 @@ export const LocationStart = () => {
     // HTML5 Geolocation API로 위치 가져오기
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
           const accuracy = position.coords.accuracy;
@@ -45,18 +45,45 @@ export const LocationStart = () => {
           console.log(`   경도: ${lng}`);
           console.log(`   정확도: ${accuracy}m`);
 
-          // 카카오 Geocoder로 주소 확인 (선택사항)
+          // 카카오 Geocoder로 동 단위 주소 변환
           if (window.kakao.maps.services) {
             const geocoder = new window.kakao.maps.services.Geocoder();
+
             geocoder.coord2Address(lng, lat, (result, status) => {
               if (status === window.kakao.maps.services.Status.OK) {
-                const address = result[0].address.address_name;
-                console.log('📍 주소:', address);
+                const address = result[0].address;
+                const fullAddress = address.address_name;
+                const dong = address.region_3depth_name; // 동 단위
+
+                console.log('✅ 주소 변환 성공:');
+                console.log(`   전체 주소: ${fullAddress}`);
+                console.log(`   시/도: ${address.region_1depth_name}`);
+                console.log(`   구/군: ${address.region_2depth_name}`);
+                console.log(`   동: ${dong}`);
+
+                // 동 단위 정보를 포함한 위치 저장
+                const locationWithAddress = {
+                  lat,
+                  lng,
+                  accuracy,
+                  address: fullAddress,
+                  dong: dong,
+                  region_1depth: address.region_1depth_name,
+                  region_2depth: address.region_2depth_name,
+                  region_3depth: address.region_3depth_name,
+                  name: `${address.region_2depth_name} ${dong}` // 예: "해운대구 중동"
+                };
+
+                setCurrentLocation(locationWithAddress);
+              } else {
+                // 주소 변환 실패 시 좌표만 저장
+                setCurrentLocation({ lat, lng, accuracy, name: '현재 위치' });
               }
             });
+          } else {
+            setCurrentLocation({ lat, lng, accuracy, name: '현재 위치' });
           }
 
-          setCurrentLocation({ lat, lng });
           displayMap(lat, lng);
         },
         (error) => {

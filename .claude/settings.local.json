@@ -21,7 +21,8 @@
       "Bash(npm start)",
       "Bash(git checkout:*)",
       "Bash(npm run build:*)",
-      "Bash(npm run lint:*)"
+      "Bash(npm run lint:*)",
+      "Bash(KAKAO_REST_API_KEY=e3bcfd16c49bfa8084cf258e37b9aa61 npm run dev:*)"
     ],
     "deny": [],
     "ask": []

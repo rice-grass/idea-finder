@@ -120,6 +120,57 @@
   color: #666;
 }
 
+/* 로딩 메시지 */
+.loading-message {
+  width: 100%;
+  max-width: 300px;
+  padding: 40px 20px;
+  text-align: center;
+  margin: 60px auto;
+}
+
+.loading-message p {
+  font-size: 15px;
+  color: #666;
+  margin: 12px 0;
+  line-height: 1.5;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  margin: 0 auto 20px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #ff784c;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 에러 메시지 */
+.error-message {
+  width: 100%;
+  max-width: 300px;
+  padding: 30px 20px;
+  text-align: center;
+  margin: 60px auto;
+  background-color: #ffebee;
+  border-radius: 12px;
+  border: 2px solid #ef5350;
+}
+
+.error-message p {
+  font-size: 15px;
+  color: #c62828;
+  margin: 8px 0;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
 /* 코스 슬라이더 */
 .course-slider {
   width: 100%;
