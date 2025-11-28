@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import IdeaCard from './IdeaCard';
 import IdeaChatbot from './IdeaChatbot';
-import { getSavedIdeas, removeSavedIdea, exportSavedIdeas } from '../utils/savedIdeasStorage';
+import { getSavedIdeas, removeSavedIdea } from '../utils/savedIdeasStorage';
 import './SavedIdeas.css';
 
 const SavedIdeas = ({ onClose }) => {

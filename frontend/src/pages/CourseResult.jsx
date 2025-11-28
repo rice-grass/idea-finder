@@ -165,41 +165,21 @@ export const CourseResult = () => {
       linePath.forEach(point => bounds.extend(point));
     }
 
-    // 오아시스(waypoints) 마커 표시
-    if (course.waypoints && course.waypoints.length > 0) {
-      course.waypoints.forEach(waypoint => {
-        const position = new window.kakao.maps.LatLng(waypoint.lat, waypoint.lng);
-
-        const marker = new window.kakao.maps.Marker({
-          position: position,
-          map: map
+    // ✅ 오아시스(waypoints) 마커는 더 이상 찍지 않고,
+    //    지도의 bounds 계산에만 사용
+      if (course.waypoints && course.waypoints.length > 0) {
+        course.waypoints.forEach(waypoint => {
+          const position = new window.kakao.maps.LatLng(waypoint.lat, waypoint.lng);
+          bounds.extend(position);
         });
-
-        // waypoint를 bounds에 추가
-        bounds.extend(position);
-
-        // 인포윈도우
-        const infowindow = new window.kakao.maps.InfoWindow({
-          content: `<div style="padding:5px;font-size:12px;">${waypoint.name}</div>`
-        });
-
-        window.kakao.maps.event.addListener(marker, 'mouseover', () => {
-          infowindow.open(map, marker);
-        });
-
-        window.kakao.maps.event.addListener(marker, 'mouseout', () => {
-          infowindow.close();
-        });
-
-        markersRef.current.push(marker);
-      });
-    }
+      }
 
     // bounds가 유효하면 지도를 해당 영역에 맞춤
     if (!bounds.isEmpty()) {
       map.setBounds(bounds);
     }
   };
+
 
   const handleStartRun = () => {
     if (courses.length === 0) return;

@@ -4,7 +4,7 @@
 }
 
 .course-result-container {
-  background-color: #f5f5f5;
+  background-color: #fbfbfb;
   width: 100%;
   max-width: 393px;
   min-height: 100vh;
@@ -316,4 +316,182 @@
   .course-name {
     font-size: 18px;
   }
+}
+/* ===== OASIS Run Tracker / Result 공통 추가 스타일 ===== */
+
+.run-tracker-info {
+  width: 100%;
+  margin: 12px 0 10px;
+  text-align: left;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.run-tracker-course {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.run-tracker-time,
+.run-tracker-distance {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 2px;
+}
+
+.run-tracker-time span,
+.run-tracker-distance span {
+  font-weight: 700;
+  color: #ff784c;
+}
+
+/* 결과 페이지 타이틀/섹션 */
+
+.run-log-main-title {
+  width: 100%;
+  font-family: "Baloo Tamma 2-SemiBold", system-ui, -apple-system, sans-serif;
+  font-size: 22px;
+  text-align: left;
+  margin-top: 20px;
+  margin-bottom: 8px;
+}
+
+.run-log-subtitle {
+  width: 100%;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 18px;
+}
+
+.run-log-section {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.run-log-section-title {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.run-log-card {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+}
+
+.run-log-card div + div {
+  margin-top: 4px;
+}
+
+.run-log-card span {
+  font-weight: 700;
+}
+
+/* 인증샷 업로드 */
+
+.run-log-upload-box {
+  display: block;
+  width: 100%;
+  height: 180px;
+  border-radius: 18px;
+  border: 2px solid #ff784c;
+  background-color: #fffdfb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.run-log-upload-placeholder {
+  font-size: 42px;
+  color: #ff784c;
+}
+
+.run-log-upload-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.run-log-upload-help {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #999;
+  text-align: center;
+}
+
+/* 키워드 */
+
+.run-log-keyword-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.run-log-keyword-pill {
+  border-radius: 20px;
+  border: 1px solid #ffd1bf;
+  padding: 6px 12px;
+  background-color: #ffffff;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 12px;
+  color: #ff784c;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.run-log-keyword-pill.selected {
+  background-color: #ff784c;
+  color: #ffffff;
+}
+
+/* 메모 입력 */
+
+.run-log-memo {
+  width: 100%;
+  border-radius: 20px;
+  border: 1px solid #ddd;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-family: system-ui, -apple-system, sans-serif;
+  outline: none;
+}
+
+.run-log-memo::placeholder {
+  color: #bbb;
+}
+
+/* Solar 버튼 */
+
+.run-log-generate-btn {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 24px;
+  border: none;
+  background-color: #ff784c;
+  color: #ffffff;
+  font-family: "Baloo Tamma 2-SemiBold", system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+  box-shadow: 0 4px 12px rgba(255, 120, 76, 0.35);
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.run-log-generate-btn:hover {
+  background-color: #ff6838;
+  transform: translateY(-1px);
+}
+
+.run-log-generate-btn:active {
+  background-color: #ff5522;
+  transform: translateY(0);
 }

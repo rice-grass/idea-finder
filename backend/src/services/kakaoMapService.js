@@ -7,8 +7,10 @@ dotenv.config();
 class KakaoMapService {
   constructor() {
     this.restApiKey = process.env.KAKAO_REST_API_KEY;
+    this.tmapApiKey = process.env.TMAP_API_KEY;
     this.localApiUrl = 'https://dapi.kakao.com/v2/local';
-    this.directionsApiUrl = 'https://apis-navi.kakaomobility.com/v1/directions';
+    this.naviApiUrl = 'https://apis-navi.kakaomobility.com/v1';
+    this.tmapApiUrl = 'https://apis.openapi.sk.com/tmap/routes';
   }
 
   /**
@@ -45,15 +47,187 @@ class KakaoMapService {
   }
 
   /**
-   * 도보 경로 생성 (간소화된 자연스러운 경로)
+   * SK Tmap API를 사용한 실제 보행자 경로 생성 (실제 도보 가능 경로)
+   * @param {Object} origin - 출발지 {lat, lng, name}
+   * @param {Object} destination - 도착지 {lat, lng, name}
+   * @returns {Promise<Object>} 보행자 경로 정보
+   */
+  async getTmapPedestrianRoute(origin, destination) {
+    try {
+      if (!this.tmapApiKey || this.tmapApiKey === 'your_tmap_api_key_here') {
+        console.warn('⚠️ Tmap API key not configured, using fallback');
+        return { success: false };
+      }
+
+      console.log('🚶 SK Tmap Pedestrian API - 보행자 경로 요청');
+      console.log('출발:', origin);
+      console.log('도착:', destination);
+
+      const requestData = {
+        startX: String(origin.lng),
+        startY: String(origin.lat),
+        endX: String(destination.lng),
+        endY: String(destination.lat),
+        startName: origin.name || '출발지',
+        endName: destination.name || '도착지',
+        reqCoordType: 'WGS84GEO',
+        resCoordType: 'WGS84GEO',
+        searchOption: '0' // 0: 추천, 1: 최단거리, 2: 최소시간
+      };
+
+      const response = await axios.post(
+        `${this.tmapApiUrl}/pedestrian?version=1`,
+        requestData,
+        {
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'appKey': this.tmapApiKey
+          }
+        }
+      );
+
+      if (response.data && response.data.features) {
+        const features = response.data.features;
+        const allPoints = [];
+        let totalDistance = 0;
+        let totalTime = 0;
+
+        // GeoJSON 형식에서 경로 포인트 추출
+        features.forEach(feature => {
+          if (feature.geometry && feature.geometry.type === 'LineString') {
+            const coordinates = feature.geometry.coordinates;
+            coordinates.forEach(coord => {
+              allPoints.push({
+                lng: coord[0],
+                lat: coord[1]
+              });
+            });
+          }
+
+          // 거리 및 시간 정보 수집
+          if (feature.properties) {
+            totalDistance += feature.properties.distance || 0;
+            totalTime += feature.properties.time || 0;
+          }
+        });
+
+        console.log(`✅ Tmap Pedestrian API 성공: ${allPoints.length}개 포인트, ${(totalDistance / 1000).toFixed(1)}km`);
+
+        return {
+          success: true,
+          distance: totalDistance, // meters
+          duration: totalTime, // seconds
+          points: allPoints
+        };
+      }
+
+      console.warn('⚠️ Tmap API에서 경로를 찾지 못함');
+      return { success: false };
+
+    } catch (error) {
+      console.error('❌ Tmap Pedestrian API 오류:', error.response?.data || error.message);
+      return { success: false };
+    }
+  }
+
+  /**
+   * Kakao Mobility Navi API를 사용한 실제 도보 경로 생성
    * @param {Object} origin - 출발지 {lat, lng}
    * @param {Object} destination - 도착지 {lat, lng}
    * @param {Array} waypoints - 경유지 (최대 5개)
    * @returns {Promise<Object>} 도보 경로 정보
    */
-  async getWalkingRoute(origin, destination, waypoints = []) {
+  async getWalkingRouteWithNaviAPI(origin, destination, waypoints = []) {
     try {
-      // 도보 경로는 자연스러운 곡선으로 생성 (Bezier curve 사용)
+      console.log('🚶 Kakao Mobility Navi API - 도보 경로 요청');
+      console.log('출발:', origin);
+      console.log('도착:', destination);
+      console.log('경유지:', waypoints.length);
+
+      // Kakao Navi API 요청 형식: origin=lng,lat&destination=lng,lat&waypoints=lng1,lat1|lng2,lat2
+      const params = {
+        origin: `${origin.lng},${origin.lat}`,
+        destination: `${destination.lng},${destination.lat}`,
+        priority: 'RECOMMEND', // RECOMMEND, TIME, DISTANCE
+        road_type: 'BIKE', // BIKE는 도보/자전거 도로 우선
+      };
+
+      // 경유지가 있으면 추가 (최대 5개)
+      if (waypoints.length > 0) {
+        const waypointsStr = waypoints
+          .slice(0, 5)
+          .map(wp => `${wp.lng},${wp.lat}`)
+          .join('|');
+        params.waypoints = waypointsStr;
+      }
+
+      const response = await axios.get(`${this.naviApiUrl}/waypoints`, {
+        headers: {
+          'Authorization': `KakaoAK ${this.restApiKey}`,
+          'Content-Type': 'application/json'
+        },
+        params
+      });
+
+      if (response.data && response.data.routes && response.data.routes.length > 0) {
+        const route = response.data.routes[0];
+        const sections = route.sections || [];
+
+        // 모든 섹션의 경로 포인트 수집
+        const allPoints = [];
+        let totalDistance = 0;
+        let totalDuration = 0;
+
+        sections.forEach(section => {
+          totalDistance += section.distance || 0;
+          totalDuration += section.duration || 0;
+
+          // 각 섹션의 도로 정보에서 경로 포인트 추출
+          if (section.roads && section.roads.length > 0) {
+            section.roads.forEach(road => {
+              if (road.vertexes && road.vertexes.length > 0) {
+                // vertexes는 [lng, lat, lng, lat, ...] 형식
+                for (let i = 0; i < road.vertexes.length; i += 2) {
+                  allPoints.push({
+                    lng: road.vertexes[i],
+                    lat: road.vertexes[i + 1]
+                  });
+                }
+              }
+            });
+          }
+        });
+
+        console.log(`✅ Navi API 경로 생성 완료: ${allPoints.length}개 포인트, ${(totalDistance / 1000).toFixed(1)}km`);
+
+        return {
+          success: true,
+          distance: totalDistance, // meters
+          duration: totalDuration, // seconds
+          points: allPoints
+        };
+      }
+
+      console.warn('⚠️ Navi API에서 경로를 찾지 못함, Fallback 사용');
+      return this.getWalkingRouteFallback(origin, destination, waypoints);
+
+    } catch (error) {
+      console.error('❌ Kakao Navi API 오류:', error.response?.data || error.message);
+      console.log('🔄 Fallback 경로 생성 사용');
+      return this.getWalkingRouteFallback(origin, destination, waypoints);
+    }
+  }
+
+  /**
+   * Fallback: 간소화된 자연스러운 경로 생성 (Bezier curve 사용)
+   * @param {Object} origin - 출발지 {lat, lng}
+   * @param {Object} destination - 도착지 {lat, lng}
+   * @param {Array} waypoints - 경유지
+   * @returns {Promise<Object>} 도보 경로 정보
+   */
+  async getWalkingRouteFallback(origin, destination, waypoints = []) {
+    try {
       const allPoints = [];
 
       // 시작점 추가
@@ -65,7 +239,6 @@ class KakaoMapService {
       allWaypoints.push(destination);
 
       allWaypoints.forEach(nextPoint => {
-        // 두 점 사이를 부드럽게 연결하는 중간 포인트들 생성
         const intermediatePoints = this.generateSmoothPath(currentPoint, nextPoint);
         allPoints.push(...intermediatePoints);
         currentPoint = nextPoint;
@@ -81,19 +254,40 @@ class KakaoMapService {
       }
 
       // 도보 속도 기준 (평균 5km/h)
-      const walkingSpeed = 5; // km/h
-      const duration = (totalDistance / walkingSpeed) * 3600; // seconds
+      const walkingSpeed = 5;
+      const duration = (totalDistance / walkingSpeed) * 3600;
 
       return {
         success: true,
-        distance: totalDistance * 1000, // meters
-        duration: duration, // seconds
+        distance: totalDistance * 1000,
+        duration: duration,
         points: allPoints
       };
     } catch (error) {
-      console.error('Error generating walking route:', error.message);
+      console.error('Error generating fallback walking route:', error.message);
       return { success: false, points: [] };
     }
+  }
+
+  /**
+   * 도보 경로 생성 - 여러 API를 시도하여 최상의 보행자 경로 제공
+   * 우선순위: 1) SK Tmap Pedestrian API (실제 보행 가능 경로)
+   *          2) Kakao Navi API (BIKE road_type)
+   *          3) Bezier Curve Fallback (부드러운 예상 경로)
+   */
+  async getWalkingRoute(origin, destination, waypoints = []) {
+    // 경유지가 없는 경우, SK Tmap Pedestrian API 사용 (가장 정확한 보행자 경로)
+    if (waypoints.length === 0) {
+      const tmapResult = await this.getTmapPedestrianRoute(origin, destination);
+      if (tmapResult.success) {
+        console.log('✅ Using Tmap Pedestrian API for accurate walking route');
+        return tmapResult;
+      }
+    }
+
+    // Tmap 실패 또는 경유지가 있는 경우, Kakao Navi API 시도
+    console.log('🔄 Trying Kakao Navi API...');
+    return this.getWalkingRouteWithNaviAPI(origin, destination, waypoints);
   }
 
   /**
@@ -231,7 +425,8 @@ class KakaoMapService {
       console.log(`✅ Route generated: ${allRoutePoints.length} points, ${(totalDistance / 1000).toFixed(1)}km`);
 
       return {
-        waypoints: allRoutePoints,
+        route: allRoutePoints,        // 경로 포인트 배열
+        waypoints: allRoutePoints,    // waypoints도 유지 (호환성)
         center: { lat: centerLat, lng: centerLng },
         totalDistance: `${(totalDistance / 1000).toFixed(1)}km`,
         duration: `${Math.round(totalDuration / 60)}분`,
@@ -250,7 +445,8 @@ class KakaoMapService {
       allPoints.push(start); // 순환
 
       return {
-        waypoints: allPoints,
+        route: allPoints,        // 경로 포인트 배열
+        waypoints: allPoints,    // waypoints도 유지 (호환성)
         center: {
           lat: (start.lat + end.lat) / 2,
           lng: (start.lng + end.lng) / 2

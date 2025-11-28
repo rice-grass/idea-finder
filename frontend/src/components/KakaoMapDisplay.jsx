@@ -6,16 +6,18 @@ function KakaoMapDisplay({
   height = '500px',
   center = null,
   showMarkers = true, // 마커 표시 여부
-  oasisLocations = [], // 오아시스 위치
-  onOasisClick = null, // 오아시스 클릭 핸들러
-  selectedOasis = [] // 선택된 오아시스
+  oasisLocations = [] // 오아시스 위치
 }) {
   const mapContainer = useRef(null);
   const mapInstance = useRef(null);
   const markersRef = useRef([]);
   const polylineRef = useRef(null);
+  const currentLocationMarkerRef = useRef(null);
+  const watchIdRef = useRef(null);
   const [isSDKLoaded, setIsSDKLoaded] = useState(false);
   const [loadError, setLoadError] = useState(false);
+  const [, setCurrentLocation] = useState(null);
+  const [isTrackingLocation] = useState(true);
 
   // SDK loading detection
   useEffect(() => {
@@ -65,8 +67,131 @@ function KakaoMapDisplay({
       // Cleanup
       clearMarkers();
       clearPolyline();
+      if (watchIdRef.current) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
+      }
     };
   }, [isSDKLoaded, center]);
+
+  // 실시간 위치 추적
+  useEffect(() => {
+    if (!isSDKLoaded || !mapInstance.current || !isTrackingLocation) return;
+
+    if (navigator.geolocation) {
+      // 실시간 위치 추적 시작
+      watchIdRef.current = navigator.geolocation.watchPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          const newLocation = { lat, lng };
+
+          setCurrentLocation(newLocation);
+          console.log('📍 실시간 위치 업데이트:', newLocation);
+
+          // 현재 위치 마커 업데이트
+          updateCurrentLocationMarker(lat, lng);
+        },
+        (error) => {
+          console.error('❌ 위치 추적 오류:', error);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+      );
+
+      // 초기 위치 가져오기
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          const locPosition = new window.kakao.maps.LatLng(lat, lng);
+
+          setCurrentLocation({ lat, lng });
+          mapInstance.current.setCenter(locPosition);
+          updateCurrentLocationMarker(lat, lng);
+
+          console.log('✅ 초기 위치 설정:', { lat, lng });
+        },
+        (error) => {
+          console.error('❌ 초기 위치 가져오기 실패:', error);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+      );
+    }
+
+    return () => {
+      if (watchIdRef.current) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
+      }
+    };
+  }, [isSDKLoaded, isTrackingLocation]);
+
+  // 현재 위치 마커 업데이트
+  const updateCurrentLocationMarker = (lat, lng) => {
+    if (!mapInstance.current) return;
+
+    // 기존 마커 제거
+    if (currentLocationMarkerRef.current) {
+      currentLocationMarkerRef.current.setMap(null);
+    }
+
+    // 현재 위치 마커 이미지 (빨간색 핀)
+    const imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png';
+    const imageSize = new window.kakao.maps.Size(35, 45);
+    const markerImage = new window.kakao.maps.MarkerImage(imageSrc, imageSize);
+
+    const markerPosition = new window.kakao.maps.LatLng(lat, lng);
+    const marker = new window.kakao.maps.Marker({
+      position: markerPosition,
+      map: mapInstance.current,
+      image: markerImage,
+      zIndex: 100
+    });
+
+    const infoWindow = new window.kakao.maps.InfoWindow({
+      content: '<div style="padding:8px 12px;font-size:13px;font-weight:600;color:#ff4444;">📍 현재 위치</div>'
+    });
+    infoWindow.open(mapInstance.current, marker);
+
+    currentLocationMarkerRef.current = marker;
+  };
+
+  // 위치 새로고침 핸들러
+  const handleRefreshLocation = () => {
+    if (!navigator.geolocation) {
+      alert('위치 서비스를 사용할 수 없습니다.');
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        const locPosition = new window.kakao.maps.LatLng(lat, lng);
+
+        setCurrentLocation({ lat, lng });
+        mapInstance.current.setCenter(locPosition);
+        updateCurrentLocationMarker(lat, lng);
+
+        console.log('🔄 위치 새로고침 완료:', { lat, lng });
+      },
+      (error) => {
+        console.error('❌ 위치 새로고침 실패:', error);
+        alert('위치를 가져올 수 없습니다. 위치 서비스를 확인해주세요.');
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    );
+  };
 
   useEffect(() => {
     if (!isSDKLoaded || !mapInstance.current || !route || !route.waypoints) return;
@@ -159,13 +284,8 @@ function KakaoMapDisplay({
     oasisLocations.forEach((oasis) => {
       const markerPosition = new window.kakao.maps.LatLng(oasis.lat, oasis.lng);
 
-      // 선택 여부 확인
-      const isSelected = selectedOasis.some(o => o.name === oasis.name);
-
-      // 오아시스 마커 이미지 (주황색)
-      const imageSrc = isSelected
-        ? 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png'
-        : 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png';
+      // 오아시스 마커 이미지 (별 모양)
+      const imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png';
       const imageSize = new window.kakao.maps.Size(30, 35);
       const markerImage = new window.kakao.maps.MarkerImage(imageSrc, imageSize);
 
@@ -176,12 +296,11 @@ function KakaoMapDisplay({
       });
 
       // Info window
-      const icon = oasis.type === 'restaurant' ? '🍽️' : '🏛️';
+      const icon = oasis.type === 'restaurant' ? '🍽️' : oasis.type === 'cafe' ? '☕' : '🏛️';
       const infoContent = `
-        <div style="padding:10px;min-width:150px;cursor:pointer;">
+        <div style="padding:10px;min-width:150px;">
           <h4 style="margin:0 0 5px 0;font-size:14px;">${icon} ${oasis.name || '오아시스'}</h4>
-          <p style="margin:0;font-size:12px;color:#666;">${oasis.type || '편의점'}</p>
-          ${isSelected ? '<p style="margin:5px 0 0;font-size:11px;color:#ff784c;font-weight:600;">✓ 선택됨</p>' : ''}
+          <p style="margin:0;font-size:12px;color:#666;">${oasis.address || oasis.description || ''}</p>
         </div>
       `;
 
@@ -192,15 +311,12 @@ function KakaoMapDisplay({
       // Add click event
       window.kakao.maps.event.addListener(marker, 'click', function() {
         infoWindow.open(mapInstance.current, marker);
-        if (onOasisClick) {
-          onOasisClick(oasis);
-        }
       });
 
       markersRef.current.push({ marker, infoWindow, isOasis: true });
     });
 
-  }, [isSDKLoaded, oasisLocations, onOasisClick, selectedOasis]);
+  }, [isSDKLoaded, oasisLocations]);
 
   const clearMarkers = () => {
     markersRef.current.forEach(item => {
@@ -245,6 +361,15 @@ function KakaoMapDisplay({
           display: isSDKLoaded ? 'block' : 'none'
         }}
       />
+      {isSDKLoaded && (
+        <button
+          className="location-refresh-btn"
+          onClick={handleRefreshLocation}
+          title="현재 위치로 이동"
+        >
+          📍
+        </button>
+      )}
       {isSDKLoaded && (!route || !route.waypoints || route.waypoints.length === 0) && (
         <div className="map-placeholder">
           <p>🗺️ 코스를 생성하면 지도에 표시됩니다</p>

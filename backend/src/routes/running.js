@@ -5,6 +5,7 @@ import getPublicDataService from '../services/publicDataService.js';
 import getKakaoMapService from '../services/kakaoMapService.js';
 import getPhotoService from '../services/photoService.js';
 import { getOpenAIService } from '../services/openaiService.js';
+import localDataService from '../services/localDataService.js';
 import runningConfig from '../config/runningThemes.js';
 
 const router = express.Router();

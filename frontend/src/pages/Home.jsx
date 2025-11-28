@@ -340,19 +340,6 @@ function Home() {
     }
   };
 
-  // Theme navigation with arrows
-  const handlePrevTheme = () => {
-    setSelectedThemeIndex((prev) =>
-      prev === 0 ? themes.length - 1 : prev - 1
-    );
-  };
-
-  const handleNextTheme = () => {
-    setSelectedThemeIndex((prev) =>
-      prev === themes.length - 1 ? 0 : prev + 1
-    );
-  };
-
   // Distance swipe handling
   const handleTouchStart = (e) => {
     setTouchStart(e.targetTouches[0].clientX);
@@ -487,19 +474,6 @@ function Home() {
   const handlePrevStep = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const canProceedToNextStep = () => {
-    switch (currentStep) {
-      case 1:
-        return currentLocation !== null;
-      case 2:
-        return themes.length > 0;
-      case 3:
-        return distances.length > 0 && selectedDifficulty !== '';
-      default:
-        return true;
     }
   };
 

@@ -7,6 +7,8 @@ import DistanceDifficulty from './pages/DistanceDifficulty'
 import CourseLoading from './pages/CourseLoading'
 import CourseResult from './pages/CourseResult'
 import OasisMatching from './pages/OasisMatching'
+import OasisRunTracker from './pages/OasisRunTracker'
+import OasisRunResult from './pages/OasisRunResult'
 import { healthCheck } from './services/api'
 
 function App() {
@@ -16,8 +18,8 @@ function App() {
       try {
         await healthCheck();
         console.log('✅ Backend keepalive ping sent');
-      } catch (error) {
-        console.log('⚠️ Backend keepalive ping failed (backend might be sleeping)');
+      } catch (err) {
+        console.log('⚠️ Backend keepalive ping failed (backend might be sleeping)', err);
       }
     };
 
@@ -40,6 +42,8 @@ function App() {
           <Route path="/course-loading" element={<CourseLoading />} />
           <Route path="/course-result" element={<CourseResult />} />
           <Route path="/oasis" element={<OasisMatching />} />
+          <Route path="/oasis/run" element={<OasisRunTracker />} />
+          <Route path="/oasis/result" element={<OasisRunResult />} />
         </Routes>
       </div>
     </Router>

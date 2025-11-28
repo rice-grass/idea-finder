@@ -8,7 +8,7 @@ const IdeaChatbot = ({ ideas, onClose }) => {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [showOptions, setShowOptions] = useState(true);
-  const [currentStep, setCurrentStep] = useState('start');
+  const [, setCurrentStep] = useState('start');
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {

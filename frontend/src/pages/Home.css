@@ -2,7 +2,7 @@
 
 .home-container-mobile {
   min-height: 100vh;
-  background: linear-gradient(135deg, #1a1f3a 0%, #2d1b3d 100%);
+  background: #fbfbfb;
   padding: 20px;
   display: flex;
   flex-direction: column;
