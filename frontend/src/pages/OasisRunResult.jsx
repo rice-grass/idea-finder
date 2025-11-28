@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { runningAPI } from '../services/api';
 import './OasisMatching.css';
 import runwaveLogo from '../../image/image.png';
 import image212 from '../../image/image-212.png';
@@ -34,6 +35,9 @@ const OasisRunResult = () => {
   const [selectedKeywords, setSelectedKeywords] = useState([]);
   const [memo, setMemo] = useState('');
   const [photoPreview, setPhotoPreview] = useState(null);
+  const [uploadedPhoto, setUploadedPhoto] = useState(null);
+  const [photoAnalysis, setPhotoAnalysis] = useState(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const handleToggleKeyword = (word) => {
     setSelectedKeywords((prev) =>
@@ -43,25 +47,73 @@ const OasisRunResult = () => {
     );
   };
 
-  const handlePhotoChange = (e) => {
+  const handlePhotoChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Show preview
     const reader = new FileReader();
     reader.onloadend = () => {
       setPhotoPreview(reader.result);
     };
     reader.readAsDataURL(file);
+
+    // Store file and analyze with OpenAI Vision
+    setUploadedPhoto(file);
+    setIsAnalyzing(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('photo', file);
+
+      const response = await runningAPI.analyzePhoto(formData);
+      if (response.data && response.data.success) {
+        setPhotoAnalysis(response.data.data);
+        console.log('✅ Photo analysis:', response.data.data);
+      }
+    } catch (error) {
+      console.error('❌ Photo analysis error:', error);
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
-  const handleGenerateClick = () => {
-    console.log('생성 요청', {
-      distanceKm,
-      durationMs,
-      courseName,
-      selectedKeywords,
-      memo,
-    });
-    alert('Solar AI 연동 예정입니다 🙂');
+  const handleGenerateClick = async () => {
+    if (!uploadedPhoto) {
+      alert('인증샷을 먼저 업로드해주세요!');
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('photo', uploadedPhoto);
+      formData.append('distance', distanceKm);
+      formData.append('duration', durationMs);
+      formData.append('courseName', courseName);
+      formData.append('keywords', selectedKeywords.join(', '));
+      formData.append('memo', memo);
+
+      if (photoAnalysis) {
+        formData.append('photoAnalysis', JSON.stringify(photoAnalysis));
+      }
+
+      const response = await runningAPI.generateReelsScript(formData);
+      if (response.data && response.data.success) {
+        // Navigate to Solar AI result page with generated content
+        navigate('/solar-ai-result', {
+          state: {
+            generatedContent: response.data.data,
+            distanceKm,
+            durationMs,
+            courseName,
+            photoPreview
+          }
+        });
+      }
+    } catch (error) {
+      console.error('❌ Solar AI generation error:', error);
+      alert('콘텐츠 생성 중 오류가 발생했습니다.');
+    }
   };
 
   return (
@@ -120,7 +172,10 @@ const OasisRunResult = () => {
             onChange={handlePhotoChange}
           />
         </label>
-        <p className="upload-help">▲오늘의 러닝 인증샷을 업로드 하세요</p>
+        <p className="upload-help">
+          ▲오늘의 러닝 인증샷을 업로드 하세요
+          {isAnalyzing && ' (AI 분석 중...)'}
+        </p>
       </div>
 
       <div className="run-result-section">

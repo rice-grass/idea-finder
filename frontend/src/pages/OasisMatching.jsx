@@ -214,8 +214,10 @@ function OasisMatching() {
       {/* 지도 섹션 */}
       <div className="map-section oasis-map-container">
         <KakaoMapDisplay
-          route={generatedCourse.route || { waypoints: generatedCourse.waypoints }}
-          height="100%"
+          route={{
+            waypoints: generatedCourse.route || generatedCourse.waypoints || []
+          }}
+          height="280px"
           center={routeCenter || currentLocation}
           showMarkers={true}
           oasisLocations={nearbyOasis.filter(oasis => {

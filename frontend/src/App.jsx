@@ -9,6 +9,7 @@ import CourseResult from './pages/CourseResult'
 import OasisMatching from './pages/OasisMatching'
 import OasisRunTracker from './pages/OasisRunTracker'
 import OasisRunResult from './pages/OasisRunResult'
+import SolarAIResult from './pages/SolarAIResult'
 import { healthCheck } from './services/api'
 
 function App() {
@@ -44,6 +45,7 @@ function App() {
           <Route path="/oasis" element={<OasisMatching />} />
           <Route path="/oasis/run" element={<OasisRunTracker />} />
           <Route path="/oasis/result" element={<OasisRunResult />} />
+          <Route path="/solar-ai-result" element={<SolarAIResult />} />
         </Routes>
       </div>
     </Router>

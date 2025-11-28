@@ -458,3 +458,64 @@
     flex: 0 0 78%;
   }
 }
+
+/* Solar AI Result Page Styles */
+.solar-photo-container {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.solar-result-photo {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+.solar-content-card {
+  background-color: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.solar-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.solar-content {
+  font-size: 15px;
+  font-weight: 400;
+  color: #555;
+  margin: 0;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.solar-hashtags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.solar-hashtag {
+  display: inline-block;
+  padding: 6px 12px;
+  background-color: #f0f0f0;
+  color: #667eea;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 16px;
+}
+
+.solar-action-buttons {
+  width: 100%;
+  margin-top: 20px;
+}
