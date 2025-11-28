@@ -483,6 +483,93 @@ ${ideasContext}
       throw error;
     }
   }
+
+  /**
+   * Analyze running photo using OpenAI Vision API
+   * @param {string} base64Image - Base64 encoded image
+   * @param {string} keywords - Optional keywords from user
+   * @returns {Promise<Object>} Analysis result
+   */
+  async analyzeRunningPhoto(base64Image, keywords = '') {
+    try {
+      const prompt = `이 러닝 사진을 분석해주세요.
+${keywords ? `키워드: ${keywords}` : ''}
+
+다음 정보를 JSON 형식으로 추출해주세요:
+{
+  "location": "장소/배경 (예: 해변, 공원, 도심 등)",
+  "timeOfDay": "시간대 (예: 일출, 낮, 일몰, 야경 등)",
+  "mood": "분위기/느낌 (예: 상쾌한, 활기찬, 평화로운 등)",
+  "landmarks": ["눈에 띄는 랜드마크나 특징 1", "특징 2"],
+  "activityType": "러닝 활동 종류 (예: 조깅, 스피드런, 산책 등)",
+  "weather": "날씨 상태 (예: 맑음, 흐림 등)",
+  "scenery": "주요 경치 요소"
+}`;
+
+      const completion = await this.openai.chat.completions.create({
+        model: "gpt-4o-mini", // Use gpt-4o-mini for vision (cost-effective)
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: prompt
+              },
+              {
+                type: "image_url",
+                image_url: {
+                  url: `data:image/jpeg;base64,${base64Image}`,
+                  detail: "low" // Use low detail for faster processing
+                }
+              }
+            ]
+          }
+        ],
+        max_tokens: 500,
+        temperature: 0.3 // Lower temperature for more factual analysis
+      });
+
+      const response = completion.choices[0].message.content;
+
+      // Try to parse JSON from response
+      try {
+        // Extract JSON if wrapped in markdown code blocks
+        const jsonMatch = response.match(/```json\s*([\s\S]*?)\s*```/) || response.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const jsonStr = jsonMatch[1] || jsonMatch[0];
+          return JSON.parse(jsonStr);
+        }
+        // Try to parse directly
+        return JSON.parse(response);
+      } catch (parseError) {
+        console.warn('Could not parse Vision API response as JSON, returning raw text:', parseError.message);
+        return {
+          rawAnalysis: response,
+          location: '분석 결과 텍스트 참조',
+          timeOfDay: '알 수 없음',
+          mood: '알 수 없음',
+          landmarks: [],
+          activityType: '러닝'
+        };
+      }
+    } catch (error) {
+      console.error('Error analyzing running photo:', error.message);
+      // Return fallback analysis
+      return {
+        error: error.message,
+        location: '해변 또는 도시',
+        timeOfDay: '낮',
+        mood: '활기찬',
+        landmarks: ['러닝 코스'],
+        activityType: '조깅',
+        rawAnalysis: `이미지 분석 중 오류가 발생했습니다: ${error.message}`
+      };
+    }
+  }
 }
 
-export default new OpenAIService();
+const openaiServiceInstance = new OpenAIService();
+
+export const getOpenAIService = () => openaiServiceInstance;
+export default openaiServiceInstance;

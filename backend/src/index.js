@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import githubRoutes from './routes/github.js';
 import ideaRoutes from './routes/idea.js';
+import runningRoutes from './routes/running.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -51,6 +52,7 @@ app.use((req, res, next) => {
 // Routes
 app.use('/api/github', githubRoutes);
 app.use('/api/ideas', ideaRoutes);
+app.use('/api/running', runningRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

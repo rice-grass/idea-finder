@@ -1,0 +1,120 @@
+.course-settings {
+  text-align: center;
+  padding: 20px;
+}
+
+.course-settings h2 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.course-settings .subtitle {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.settings-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.setting-section {
+  margin-bottom: 40px;
+}
+
+.setting-section h3 {
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+  color: #444;
+  text-align: left;
+}
+
+.options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.option-card {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.option-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  border-color: #4ECDC4;
+}
+
+.option-card.selected {
+  background: linear-gradient(135deg, #4ECDC4 0%, #45B7D1 100%);
+  border-color: #4ECDC4;
+  color: white;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(78, 205, 196, 0.3);
+}
+
+.option-card.difficulty-beginner.selected {
+  background: linear-gradient(135deg, #96CEB4 0%, #88D8B0 100%);
+  border-color: #96CEB4;
+}
+
+.option-card.difficulty-intermediate.selected {
+  background: linear-gradient(135deg, #FFA500 0%, #FFB347 100%);
+  border-color: #FFA500;
+}
+
+.option-card.difficulty-advanced.selected {
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+  border-color: #FF6B6B;
+}
+
+.option-icon {
+  font-size: 2.5rem;
+  margin-bottom: 8px;
+}
+
+.option-label {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.option-detail {
+  font-size: 0.9rem;
+  opacity: 0.85;
+  margin-bottom: 4px;
+}
+
+.option-meta {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .options-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .course-settings h2 {
+    font-size: 1.5rem;
+  }
+
+  .setting-section h3 {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .options-grid {
+    grid-template-columns: 1fr;
+  }
+}

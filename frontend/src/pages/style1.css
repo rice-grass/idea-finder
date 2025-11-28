@@ -1,0 +1,259 @@
+.element {
+  background-color: #fbfbfb;
+  width: 100%;
+  min-width: 393px;
+  min-height: 852px;
+  position: relative;
+}
+
+.element .image {
+  top: 188px;
+  left: 0;
+  width: 393px;
+  height: 664px;
+  aspect-ratio: 0.78;
+  position: absolute;
+  object-fit: cover;
+}
+
+.element .vector {
+  position: absolute;
+  top: 98px;
+  left: 16px;
+  width: 361px;
+  height: 1px;
+}
+
+.element .upload-property {
+  position: absolute;
+  top: 719px;
+  left: 55px;
+  width: 307px;
+  height: 98px;
+}
+
+.element .img {
+  position: absolute;
+  width: 10.90%;
+  height: 33.77%;
+  top: 22.08%;
+  left: 79.81%;
+}
+
+.element .text-wrapper {
+  width: 36.22%;
+  height: 32.47%;
+  top: 23.38%;
+  left: 30.77%;
+  font-family: "Cairo-Bold", Helvetica;
+  font-weight: 700;
+  color: #ffffff;
+  font-size: 13px;
+  position: absolute;
+  text-align: center;
+  letter-spacing: 0;
+  line-height: normal;
+}
+
+.element .frame {
+  width: 98.08%;
+  left: 0;
+  background-color: #ff784c;
+  border-radius: var(--kit-scroll-edge-effect-blur-radius);
+  position: absolute;
+  height: 74.03%;
+  top: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.element .div {
+  margin-bottom: -0.5px;
+  margin-left: 1.9px;
+  width: 1px;
+  height: 44px;
+  position: relative;
+  font-family: "Baloo Tamma 2-SemiBold", Helvetica;
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 25px;
+  text-align: center;
+  letter-spacing: 0;
+  line-height: normal;
+}
+
+.element .group {
+  position: absolute;
+  top: 121px;
+  left: 92px;
+  width: 209px;
+  height: 9px;
+}
+
+.element .upload-property-2 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 47px;
+  height: 9px;
+}
+
+.element .vector-2 {
+  position: absolute;
+  width: 10.90%;
+  height: 33.77%;
+  top: 22.08%;
+  left: 79.80%;
+}
+
+.element .text-wrapper-2 {
+  width: 36.22%;
+  height: 32.47%;
+  top: 23.38%;
+  left: 30.77%;
+  font-family: "Cairo-Bold", Helvetica;
+  font-weight: 700;
+  color: #ffffff;
+  font-size: 13px;
+  white-space: nowrap;
+  position: absolute;
+  text-align: center;
+  letter-spacing: 0;
+  line-height: normal;
+}
+
+.element .div-wrapper {
+  width: 98.08%;
+  left: 0;
+  background-color: #ff784c;
+  position: absolute;
+  height: 74.03%;
+  top: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  border-radius: 2px;
+}
+
+.element .text-wrapper-3 {
+  margin-bottom: -0.3px;
+  margin-left: 0.9px;
+  width: 1px;
+  height: 44px;
+  position: relative;
+  font-family: "Baloo Tamma 2-SemiBold", Helvetica;
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 25px;
+  text-align: center;
+  letter-spacing: 0;
+  line-height: normal;
+}
+
+.element .frame-2 {
+  width: 22.05%;
+  left: 26.30%;
+  background-color: #d9d9d9b2;
+  position: absolute;
+  height: 74.03%;
+  top: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  border-radius: 2px;
+}
+
+.element .frame-3 {
+  width: 22.05%;
+  left: 52.13%;
+  background-color: #d9d9d9b2;
+  border-radius: 2px;
+  position: absolute;
+  height: 74.03%;
+  top: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.element .frame-4 {
+  width: 22.05%;
+  left: 77.95%;
+  background-color: #d9d9d9b2;
+  border-radius: 2px;
+  position: absolute;
+  height: 74.03%;
+  top: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.element .group-2 {
+  position: absolute;
+  top: 33px;
+  left: 21px;
+  width: 238px;
+  height: 65px;
+}
+
+.element .group-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 65px;
+  display: flex;
+  align-items: flex-end;
+  min-width: 238px;
+}
+
+.element .group-3 {
+  width: 99px;
+  height: 48px;
+  background-image: url(./img/group-14.svg);
+  background-size: 100% 100%;
+}
+
+.element .image-2 {
+  top: 35px;
+  left: 97px;
+  width: 19px;
+  height: 19px;
+  aspect-ratio: 1;
+  position: absolute;
+  object-fit: cover;
+}
+
+.element .text-wrapper-4 {
+  position: absolute;
+  top: 727px;
+  left: 56px;
+  width: 299px;
+  height: 65px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Baloo Tamma 2-SemiBold", Helvetica;
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 24px;
+  text-align: center;
+  letter-spacing: 0;
+  line-height: normal;
+}
+
+.element .text-wrapper-5 {
+  top: 169px;
+  left: 41px;
+  width: 314px;
+  font-family: "Post No Bills Jaffna SemiBold-Regular", Helvetica;
+  font-weight: 400;
+  color: #d54819;
+  font-size: 25px;
+  position: absolute;
+  text-align: center;
+  letter-spacing: 0;
+  line-height: normal;
+}
+

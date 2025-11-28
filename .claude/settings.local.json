@@ -16,7 +16,10 @@
       "Bash(xargs:*)",
       "Bash(/home/ricegrass/sw/idea-finder/frontend/public/simple.html)",
       "Bash(ip addr:*)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(python3:*)",
+      "Bash(npm start)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,0 +1,252 @@
+[
+  {
+    "name": "이름 없음",
+    "district": "",
+    "lat": 35.156017,
+    "lng": 129.18184,
+    "address": null,
+    "description": "",
+    "phone": "",
+    "type": "touristSpot"
+  },
+  {
+    "name": "이름 없음",
+    "district": "",
+    "lat": 35.203136,
+    "lng": 129.08629,
+    "address": "부산광역시 동래구 명륜로112번길 61",
+    "description": "",
+    "phone": "",
+    "type": "touristSpot"
+  },
+  {
+    "name": "이름 없음",
+    "district": "",
+    "lat": 35.076805,
+    "lng": 129.01797,
+    "address": "부산광역시 서구 송도해변로 100(송도해수욕장)",
+    "description": "",
+    "phone": "",
+    "type": "touristSpot"
+  },
+  {
+    "name": "이름 없음",
+    "district": "",
+    "lat": 35.09725,
+    "lng": 129.03569,
+    "address": "부산광역시 중구 태종로 8 중구 관광안내소",
+    "description": "",
+    "phone": "",
+    "type": "touristSpot"
+  },
+  {
+    "name": "이름 없음",
+    "district": "",
+    "lat": 35.094585,
+    "lng": 129.03874,
+    "address": "부산광역시 영도구 봉래나루로 79(봉래동1가)",
+    "description": "",
+    "phone": "",
+    "type": "touristSpot"
+  },
+  {
+    "name": "이름 없음",
+    "district": "",
+    "lat": 35.097443,
+    "lng": 129.01062,
+    "address": "부산광역시 사하구 감내2로 203",
+    "description": "",
+    "phone": "",
+    "type": "touristSpot"
+  },
+  {
+    "name": "이름 없음",
+    "district": "",
+    "lat": 35.101543,
+    "lng": 129.12305,
+    "address": "부산광역시 남구 오륙도로 137",
+    "description": "",
+    "phone": "",
+    "type": "touristSpot"
+  },
+  {
+    "name": "이름 없음",
+    "district": "",
+    "lat": 35.153805,
+    "lng": 129.11867,
+    "address": null,
+    "description": "",
+    "phone": "",
+    "type": "touristSpot"
+  },
+  {
+    "name": "이름 없음",
+    "district": "",
+    "lat": 35.113823,
+    "lng": 129.0382,
+    "address": "부산광역시 동구 대영로243번길 38",
+    "description": "",
+    "phone": "",
+    "type": "touristSpot"
+  },
+  {
+    "name": "이름 없음",
+    "district": "",
+    "lat": 35.17301,
+    "lng": 128.9469,
+    "address": "부산광역시 강서구 대저2동 공항진입로 108",
+    "description": "",
+    "phone": "",
+    "type": "touristSpot"
+  },
+  {
+    "name": "이름 없음",
+    "district": "",
+    "lat": 35.284897,
+    "lng": 129.09575,
+    "address": "부산광역시 금정구 중앙대로 2238 ",
+    "description": "",
+    "phone": "",
+    "type": "touristSpot"
+  },
+  {
+    "name": "이름 없음",
+    "district": "",
+    "lat": 35.179386,
+    "lng": 129.19966,
+    "address": "부산광역시 해운대구 송정해변로 62 ",
+    "description": "",
+    "phone": "",
+    "type": "touristSpot"
+  },
+  {
+    "name": "이름 없음",
+    "district": "",
+    "lat": 35.157677,
+    "lng": 129.18254,
+    "address": null,
+    "description": "",
+    "phone": "",
+    "type": "touristSpot"
+  },
+  {
+    "name": "이름 없음",
+    "district": "",
+    "lat": 35.11781,
+    "lng": 129.04964,
+    "address": "부산광역시 동구 충장대로 206 (2층 2A19호)",
+    "description": "",
+    "phone": "",
+    "type": "touristSpot"
+  },
+  {
+    "name": "이름 없음",
+    "district": "",
+    "lat": 35.173313,
+    "lng": 128.947,
+    "address": "부산광역시 강서구 대저2동 공항진입로 108",
+    "description": "",
+    "phone": "",
+    "type": "touristSpot"
+  },
+  {
+    "name": "이름 없음",
+    "district": "",
+    "lat": 35.159042,
+    "lng": 129.1602,
+    "address": "부산광역시 해운대구 해운대해변로 264",
+    "description": "",
+    "phone": "",
+    "type": "touristSpot"
+  },
+  {
+    "name": "이름 없음",
+    "district": "",
+    "lat": 35.115093,
+    "lng": 129.04137,
+    "address": "부산광역시 동구 중앙대로 206",
+    "description": "",
+    "phone": "",
+    "type": "touristSpot"
+  },
+  {
+    "name": "이름 없음",
+    "district": "",
+    "lat": 35.157806,
+    "lng": 129.05751,
+    "address": null,
+    "description": "",
+    "phone": "",
+    "type": "touristSpot"
+  },
+  {
+    "name": "이름 없음",
+    "district": "",
+    "lat": 35.099506,
+    "lng": 129.03117,
+    "address": "부산광역시 중구 광복 중앙로 3",
+    "description": "",
+    "phone": "",
+    "type": "touristSpot"
+  },
+  {
+    "name": "이름 없음",
+    "district": "",
+    "lat": 35.09761,
+    "lng": 129.0322,
+    "address": "부산광역시 중구 구덕로 31",
+    "description": "",
+    "phone": "",
+    "type": "touristSpot"
+  },
+  {
+    "name": "이름 없음",
+    "district": "",
+    "lat": 35.061687,
+    "lng": 129.08107,
+    "address": "부산광역시 영도구 태종대유원지 입구",
+    "description": "",
+    "phone": "",
+    "type": "touristSpot"
+  },
+  {
+    "name": "이름 없음",
+    "district": "",
+    "lat": 35.103195,
+    "lng": 129.02669,
+    "address": "부산광역시 중구 대청로 61-2",
+    "description": "",
+    "phone": "",
+    "type": "touristSpot"
+  },
+  {
+    "name": "이름 없음",
+    "district": "",
+    "lat": 35.163307,
+    "lng": 129.1953,
+    "address": "부산광역시 해운대구 청사포로 167",
+    "description": "",
+    "phone": "",
+    "type": "touristSpot"
+  },
+  {
+    "name": "이름 없음",
+    "district": "",
+    "lat": 35.114876,
+    "lng": 129.04013,
+    "address": null,
+    "description": "",
+    "phone": "",
+    "type": "touristSpot"
+  },
+  {
+    "name": "이름 없음",
+    "district": "",
+    "lat": 35.153824,
+    "lng": 129.11864,
+    "address": "부산광역시 수영구 광안해변로 219(광안동)",
+    "description": "",
+    "phone": "",
+    "type": "touristSpot"
+  }
+]

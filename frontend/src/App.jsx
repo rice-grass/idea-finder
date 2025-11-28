@@ -1,6 +1,12 @@
 import { useEffect } from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import './App.css'
-import Home from './pages/Home'
+import LocationStart from './pages/LocationStart'
+import ThemeSelectorPage from './pages/ThemeSelectorPage'
+import DistanceDifficulty from './pages/DistanceDifficulty'
+import CourseLoading from './pages/CourseLoading'
+import CourseResult from './pages/CourseResult'
+import OasisMatching from './pages/OasisMatching'
 import { healthCheck } from './services/api'
 
 function App() {
@@ -25,9 +31,18 @@ function App() {
   }, []);
 
   return (
-    <div className="App">
-      <Home />
-    </div>
+    <Router>
+      <div className="App">
+        <Routes>
+          <Route path="/" element={<LocationStart />} />
+          <Route path="/theme-selector" element={<ThemeSelectorPage />} />
+          <Route path="/distance-difficulty" element={<DistanceDifficulty />} />
+          <Route path="/course-loading" element={<CourseLoading />} />
+          <Route path="/course-result" element={<CourseResult />} />
+          <Route path="/oasis" element={<OasisMatching />} />
+        </Routes>
+      </div>
+    </Router>
   )
 }
 

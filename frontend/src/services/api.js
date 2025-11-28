@@ -84,6 +84,64 @@ export const ideasAPI = {
     })
 };
 
+// Running API endpoints (RunWave)
+export const runningAPI = {
+  // Config endpoints
+  getThemes: () =>
+    api.get('/api/running/themes'),
+
+  getDistricts: () =>
+    api.get('/api/running/districts'),
+
+  getDifficulties: () =>
+    api.get('/api/running/difficulties'),
+
+  getDistances: () =>
+    api.get('/api/running/distances'),
+
+  // Course generation
+  generateCourse: (params) =>
+    api.post('/api/running/generate-course', {
+      district: params.district,
+      theme: params.theme,
+      distance: params.distance,
+      difficulty: params.difficulty,
+      startLocation: params.startLocation
+    }),
+
+  // Photo & Reels
+  analyzePhoto: (formData) =>
+    api.post('/api/running/analyze-photo', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+
+  generateReelsScript: (formData) =>
+    api.post('/api/running/generate-reels', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+
+  // Oasis
+  getOasisForRoute: (routeData) =>
+    api.post('/api/running/oasis', { route: routeData }),
+
+  // Search nearby oasis
+  searchNearbyOasis: (params) =>
+    api.post('/api/running/search-oasis', {
+      lat: params.lat,
+      lng: params.lng,
+      radius: params.radius,
+      route: params.route
+    }),
+
+  // AI Concierge
+  conciergeChat: (query, conversationHistory = []) =>
+    api.post('/api/running/concierge', { query, conversationHistory }),
+
+  // Health check
+  health: () =>
+    api.get('/api/running/health')
+};
+
 // Health check
 export const healthCheck = () => api.get('/health');
 

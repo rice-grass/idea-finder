@@ -1,0 +1,12 @@
+:root {
+  --byellow: rgba(253, 245, 147, 1);
+  --bnavy: rgba(2, 54, 156, 1);
+  --blightblue: rgba(188, 231, 240, 1);
+  --blight: rgba(243, 244, 248, 1);
+  --blightgrey: rgba(218, 225, 233, 1);
+  --bdarkgrey: rgba(75, 87, 103, 1);
+  --bgrey: rgba(182, 186, 202, 1);
+  --bwhite: rgba(255, 255, 255, 1);
+  --bblack: rgba(19, 20, 22, 1);
+  --kit-scroll-edge-effect-blur-radius: 10px;
+}

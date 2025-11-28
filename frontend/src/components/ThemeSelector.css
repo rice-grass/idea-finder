@@ -1,0 +1,131 @@
+.theme-selector {
+  text-align: center;
+  padding: 20px;
+}
+
+.theme-selector h2 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.theme-selector .subtitle {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.theme-card {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 16px;
+  padding: 28px 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--theme-color, #FF6B6B);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.theme-card:hover::before,
+.theme-card.selected::before {
+  transform: scaleX(1);
+}
+
+.theme-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  border-color: var(--theme-color, #FF6B6B);
+}
+
+.theme-card.selected {
+  background: var(--theme-color, #FF6B6B);
+  border-color: var(--theme-color, #FF6B6B);
+  color: white;
+  transform: translateY(-6px);
+  box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+}
+
+.theme-icon {
+  font-size: 3.5rem;
+  margin-bottom: 14px;
+  line-height: 1;
+}
+
+.theme-label {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  letter-spacing: -0.5px;
+}
+
+.theme-desc {
+  font-size: 0.95rem;
+  opacity: 0.85;
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+
+.theme-keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.keyword-tag {
+  background: rgba(0, 0, 0, 0.08);
+  padding: 5px 12px;
+  border-radius: 14px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.theme-card.selected .keyword-tag {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+@media (max-width: 768px) {
+  .theme-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .theme-selector h2 {
+    font-size: 1.5rem;
+  }
+
+  .theme-card {
+    padding: 20px 16px;
+  }
+
+  .theme-icon {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .theme-grid {
+    grid-template-columns: 1fr;
+  }
+}

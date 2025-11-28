@@ -1,0 +1,245 @@
+/* Reset and base styles */
+* {
+  -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
+}
+
+.theme-selector-container {
+  background-color: #fbfbfb;
+  width: 100%;
+  max-width: 393px;
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 33px 16px 90px;
+  box-sizing: border-box;
+  margin: 0 auto;
+}
+
+/* 헤더 섹션 */
+.header-section {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.runwave-logo {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+}
+
+.profile-icon {
+  width: 38px;
+  height: 38px;
+  object-fit: cover;
+}
+
+/* 구분선 */
+.divider {
+  width: 100%;
+  height: 1px;
+  background-color: #e0e0e0;
+  margin-bottom: 23px;
+}
+
+/* 진행 바 */
+.progress-bar {
+  width: 100%;
+  max-width: 240px;
+  display: flex;
+  justify-content: space-between;
+  gap: 13px;
+  margin-bottom: 20px;
+}
+
+.progress-step {
+  flex: 1;
+  height: 7px;
+  background-color: rgba(217, 217, 217, 0.7);
+  border-radius: 2px;
+  transition: background-color 0.3s ease;
+}
+
+.progress-step.active {
+  background-color: #ff784c;
+}
+
+/* 페이지 제목 */
+.page-title {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.step-label {
+  font-family: "Pontano Sans-Bold", system-ui, -apple-system, sans-serif;
+  font-weight: 700;
+  color: #d54819;
+  font-size: 25px;
+  text-align: left;
+  margin-bottom: 5px;
+}
+
+.step-description {
+  font-family: "Pontano Sans-Bold", system-ui, -apple-system, sans-serif;
+  font-weight: 700;
+  color: #000000;
+  font-size: 25px;
+  text-align: left;
+}
+
+/* 테마 그리드 */
+.theme-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.theme-card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 0.7;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.theme-card.selected {
+  border-color: #ff784c;
+}
+
+.theme-bg-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.theme-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(19, 20, 22, 0.5);
+  transition: opacity 0.3s ease;
+}
+
+.theme-overlay.dimmed {
+  background-color: rgba(19, 20, 22, 0.5);
+}
+
+.theme-card.selected .theme-overlay {
+  background-color: rgba(19, 20, 22, 0.2);
+}
+
+.theme-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.theme-text {
+  font-family: "Baloo Tamma 2-SemiBold", system-ui, -apple-system, sans-serif;
+  font-weight: 600;
+  font-size: 25px;
+  color: #ffffff;
+  text-align: center;
+  letter-spacing: 0;
+  line-height: normal;
+  white-space: pre-line;
+}
+
+.theme-emoji {
+  font-size: 30px;
+  display: block;
+  margin-bottom: 5px;
+}
+
+/* 하단 네비게이션 */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: 393px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  box-shadow: inset 0px 1.5px 4px rgba(0, 0, 0, 0.1), inset 0px 1.5px 4px rgba(0, 0, 0, 0.08);
+  padding: 6px 52px;
+  z-index: 100;
+}
+
+.nav-tabs {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.nav-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  padding: 5px 10px;
+  transition: opacity 0.3s ease;
+}
+
+.nav-tab:hover {
+  opacity: 0.8;
+}
+
+.nav-icon {
+  width: 37px;
+  height: 45px;
+  object-fit: contain;
+}
+
+.nav-label {
+  font-family: "Readex Pro-Bold", system-ui, -apple-system, sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  text-align: center;
+  letter-spacing: 0;
+}
+
+.nav-tab.active .nav-label {
+  color: #ff784c;
+}
+
+.nav-tab:not(.active) .nav-label {
+  color: #a8a8a8;
+}
+
+/* 반응형 */
+@media (max-width: 400px) {
+  .theme-selector-container {
+    padding: 20px 12px 90px;
+  }
+
+  .theme-grid {
+    gap: 12px;
+  }
+
+  .theme-text {
+    font-size: 22px;
+  }
+}
