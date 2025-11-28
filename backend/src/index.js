@@ -35,7 +35,7 @@ const corsOptions = {
         'https://idea-finder-nu.vercel.app',  // Production frontend URL
         /\.vercel\.app$/  // Allow all Vercel preview deployments
       ]
-    : ['http://localhost:5173', 'http://localhost:3000'],
+    : ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:3000'],
   credentials: true,
   optionsSuccessStatus: 200
 };

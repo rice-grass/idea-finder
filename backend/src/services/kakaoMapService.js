@@ -1,6 +1,7 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
 import localDataService from './localDataService.js';
+import { getGoogleDirectionsService } from './googleDirectionsService.js';
 
 dotenv.config();
 
@@ -11,6 +12,7 @@ class KakaoMapService {
     this.localApiUrl = 'https://dapi.kakao.com/v2/local';
     this.naviApiUrl = 'https://apis-navi.kakaomobility.com/v1';
     this.tmapApiUrl = 'https://apis.openapi.sk.com/tmap/routes';
+    this.googleDirectionsService = getGoogleDirectionsService();
   }
 
   /**
@@ -162,7 +164,7 @@ class KakaoMapService {
         params.waypoints = waypointsStr;
       }
 
-      const response = await axios.get(`${this.naviApiUrl}/waypoints`, {
+      const response = await axios.get(`${this.naviApiUrl}/directions`, {
         headers: {
           'Authorization': `KakaoAK ${this.restApiKey}`,
           'Content-Type': 'application/json'
@@ -271,12 +273,21 @@ class KakaoMapService {
 
   /**
    * 도보 경로 생성 - 여러 API를 시도하여 최상의 보행자 경로 제공
-   * 우선순위: 1) SK Tmap Pedestrian API (실제 보행 가능 경로)
-   *          2) Kakao Navi API (BIKE road_type)
-   *          3) Bezier Curve Fallback (부드러운 예상 경로)
+   * 우선순위: 1) Google Directions API (도보 모드, 가장 안정적)
+   *          2) SK Tmap Pedestrian API (실제 보행 가능 경로)
+   *          3) Kakao Navi API (BIKE road_type)
+   *          4) Bezier Curve Fallback (부드러운 예상 경로)
    */
   async getWalkingRoute(origin, destination, waypoints = []) {
-    // 경유지가 없는 경우, SK Tmap Pedestrian API 사용 (가장 정확한 보행자 경로)
+    // 1순위: Google Directions API (가장 안정적이고 정확함)
+    console.log('🔄 Trying Google Directions API...');
+    const googleResult = await this.googleDirectionsService.getWalkingRoute(origin, destination, waypoints);
+    if (googleResult.success) {
+      console.log('✅ Using Google Directions API for walking route');
+      return googleResult;
+    }
+
+    // 2순위: 경유지가 없는 경우, SK Tmap Pedestrian API 사용 (가장 정확한 보행자 경로)
     if (waypoints.length === 0) {
       const tmapResult = await this.getTmapPedestrianRoute(origin, destination);
       if (tmapResult.success) {
@@ -285,7 +296,7 @@ class KakaoMapService {
       }
     }
 
-    // Tmap 실패 또는 경유지가 있는 경우, Kakao Navi API 시도
+    // 3순위: Tmap 실패 또는 경유지가 있는 경우, Kakao Navi API 시도
     console.log('🔄 Trying Kakao Navi API...');
     return this.getWalkingRouteWithNaviAPI(origin, destination, waypoints);
   }
