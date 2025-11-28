@@ -357,20 +357,17 @@ router.post('/generate-reels', upload.single('photo'), async (req, res) => {
     const imageAnalysis = await openaiService.analyzeRunningPhoto(base64Image, keywords);
 
     // 4. Upstage Solar로 릴스 대본 생성
-    const script = await upstageService.generateReelsScript(
+    const generatedContent = await upstageService.generateReelsScript(
       imageAnalysis,
       keywords,
       parsedRunData
     );
 
+    console.log('✅ Solar AI 생성 완료:', generatedContent);
+
     res.json({
       success: true,
-      data: {
-        script,
-        imageAnalysis,
-        keywords,
-        runData: parsedRunData
-      }
+      data: generatedContent
     });
   } catch (error) {
     console.error('Error generating reels:', error);

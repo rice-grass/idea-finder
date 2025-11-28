@@ -197,12 +197,8 @@ function OasisMatching() {
         >
           ☕ 카페(급수대)
         </button>
-        <button
-          className={`filter-button ${oasisFilter === 'home' ? 'active' : ''}`}
-          onClick={() => setOasisFilter('home')}
-        >
-          🏠 집 보관
-        </button>
+     
+      
         <button
           className={`filter-button ${oasisFilter === 'discount' ? 'active' : ''}`}
           onClick={() => setOasisFilter('discount')}
@@ -246,7 +242,7 @@ function OasisMatching() {
       </div>
 
       <div className="oasis-category-section">
-        <h3 className="category-title">🏠 집 보관</h3>
+
         <div className="oasis-cards-scroll">
           {nearbyOasis
             .filter(o => o.type === 'touristSpot')

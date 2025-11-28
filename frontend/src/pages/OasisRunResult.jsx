@@ -38,6 +38,7 @@ const OasisRunResult = () => {
   const [uploadedPhoto, setUploadedPhoto] = useState(null);
   const [photoAnalysis, setPhotoAnalysis] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const handleToggleKeyword = (word) => {
     setSelectedKeywords((prev) =>
@@ -84,20 +85,33 @@ const OasisRunResult = () => {
       return;
     }
 
+    setIsGenerating(true);
+
     try {
       const formData = new FormData();
       formData.append('photo', uploadedPhoto);
-      formData.append('distance', distanceKm);
-      formData.append('duration', durationMs);
-      formData.append('courseName', courseName);
-      formData.append('keywords', selectedKeywords.join(', '));
-      formData.append('memo', memo);
+      formData.append('keywords', selectedKeywords.join(', ') + (memo ? ', ' + memo : ''));
 
-      if (photoAnalysis) {
-        formData.append('photoAnalysis', JSON.stringify(photoAnalysis));
-      }
+      const runData = {
+        distance: distanceKm,
+        duration: formatTime(durationMs),
+        courseName: courseName
+      };
+      formData.append('runData', JSON.stringify(runData));
+
+      console.log('🚀 Solar AI 생성 요청:', {
+        distance: distanceKm,
+        duration: durationMs,
+        courseName,
+        keywords: selectedKeywords.join(', '),
+        memo,
+        hasPhoto: !!uploadedPhoto,
+        hasAnalysis: !!photoAnalysis
+      });
 
       const response = await runningAPI.generateReelsScript(formData);
+      console.log('✅ Solar AI 응답:', response.data);
+
       if (response.data && response.data.success) {
         // Navigate to Solar AI result page with generated content
         navigate('/solar-ai-result', {
@@ -109,15 +123,30 @@ const OasisRunResult = () => {
             photoPreview
           }
         });
+      } else {
+        alert('콘텐츠 생성에 실패했습니다.');
       }
     } catch (error) {
       console.error('❌ Solar AI generation error:', error);
-      alert('콘텐츠 생성 중 오류가 발생했습니다.');
+      alert('콘텐츠 생성 중 오류가 발생했습니다: ' + (error.response?.data?.message || error.message));
+    } finally {
+      setIsGenerating(false);
     }
   };
 
   return (
     <div className="course-result-container oasis-matching-page">
+      {/* 로딩 오버레이 */}
+      {isGenerating && (
+        <div className="loading-overlay">
+          <div className="loading-spinner-container">
+            <div className="loading-spinner"></div>
+            <p className="loading-text">✨ Solar AI가 콘텐츠를 생성하고 있습니다...</p>
+            <p className="loading-subtext">잠시만 기다려주세요</p>
+          </div>
+        </div>
+      )}
+
       <div className="header-section">
         <img className="runwave-logo" alt="Runwave" src={runwaveLogo} />
         <img className="profile-icon" alt="Profile" src={image212} />

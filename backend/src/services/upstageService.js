@@ -75,7 +75,7 @@ class UpstageService {
   async generateReelsScript(imageAnalysis, keywords = '', runData = {}) {
     try {
       const prompt = `
-러닝 사진을 분석한 결과와 키워드를 바탕으로 Instagram 릴스/YouTube 숏폼용 대본을 작성해주세요.
+러닝 사진을 분석한 결과와 키워드를 바탕으로 Instagram 릴스/YouTube 숏폼용 콘텐츠를 작성해주세요.
 
 **이미지 분석 결과:**
 ${typeof imageAnalysis === 'object' ? JSON.stringify(imageAnalysis, null, 2) : imageAnalysis}
@@ -83,17 +83,23 @@ ${typeof imageAnalysis === 'object' ? JSON.stringify(imageAnalysis, null, 2) : i
 **키워드:** ${keywords || '없음'}
 
 **러닝 정보:**
-- 거리: ${runData.distance || '미상'}
-- 위치: ${runData.location || '부산'}
+- 거리: ${runData.distance || '미상'}km
+- 시간: ${runData.duration || '미상'}
+- 코스: ${runData.courseName || '부산'}
 
-**대본 요구사항:**
-1. 15-30초 분량 (150-200자)
-2. 친근하고 에너지 넘치는 톤
-3. 이모지 활용
-4. 해시태그 3-5개 포함
-5. 부산 런케이션(Run-cation) 홍보 요소 포함
+**콘텐츠 요구사항:**
+1. 제목 (짧고 임팩트 있게, 15자 이내)
+2. 본문 내용 (친근하고 에너지 넘치는 톤, 150-200자, 이모지 활용)
+3. 해시태그 3-5개 (부산 런케이션 홍보 요소 포함)
 
-대본만 작성해주세요. 다른 설명은 필요 없습니다.
+**응답 형식 (반드시 이 형식으로만 작성):**
+{
+  "title": "여기에 제목",
+  "content": "여기에 본문 내용",
+  "hashtags": ["해시태그1", "해시태그2", "해시태그3"]
+}
+
+JSON 형식으로만 응답해주세요. 다른 설명은 필요 없습니다.
       `.trim();
 
       const response = await this.client.chat.completions.create({
@@ -101,19 +107,31 @@ ${typeof imageAnalysis === 'object' ? JSON.stringify(imageAnalysis, null, 2) : i
         messages: [
           {
             role: 'system',
-            content: '당신은 SNS 콘텐츠 제작 전문가입니다. 러닝을 즐기는 2030 세대를 타겟으로 한 매력적인 대본을 작성합니다.'
+            content: '당신은 SNS 콘텐츠 제작 전문가입니다. 러닝을 즐기는 2030 세대를 타겟으로 한 매력적인 콘텐츠를 JSON 형식으로 작성합니다.'
           },
           { role: 'user', content: prompt }
         ],
-        temperature: 0.8,  // 더 창의적으로
-        max_tokens: 500
+        temperature: 0.8,
+        max_tokens: 800,
+        response_format: { type: "json_object" }
       });
 
-      return response.choices[0].message.content.trim();
+      const generatedText = response.choices[0].message.content.trim();
+      const parsed = JSON.parse(generatedText);
+
+      return {
+        title: parsed.title || '오늘의 러닝',
+        content: parsed.content || `부산에서 ${runData.distance || '5'}km 러닝을 완주했어요! 🏃‍♂️`,
+        hashtags: parsed.hashtags || ['부산러닝', 'RunWave', '런케이션']
+      };
     } catch (error) {
       console.error('Error generating reels script:', error);
-      // Fallback script
-      return `오늘 부산에서 ${runData.distance || '5km'} 러닝했어요! 🏃‍♂️\n${keywords ? keywords + '와 함께한 ' : ''}최고의 런케이션이었습니다 ✨\n\n#부산러닝 #RunWave #런케이션 #부산여행`;
+      // Fallback
+      return {
+        title: '오늘의 러닝 기록',
+        content: `오늘 부산에서 ${runData.distance || '5'}km 러닝했어요! 🏃‍♂️\n${keywords ? keywords + '와 함께한 ' : ''}최고의 런케이션이었습니다 ✨`,
+        hashtags: ['부산러닝', 'RunWave', '런케이션', '부산여행']
+      };
     }
   }
 

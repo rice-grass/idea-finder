@@ -222,16 +222,10 @@ function KakaoMapDisplay({
 
     // showMarkers가 true일 때만 마커 표시
     if (showMarkers) {
-      // 파란색 마커 이미지 (시작점, 도착점)
-      const blueMarkerImage = new window.kakao.maps.MarkerImage(
-        'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_blue.png',
-        new window.kakao.maps.Size(28, 40)
-      );
-      // Add start marker (파란색)
+      // Add start marker (기본 마커 사용)
       const startMarker = new window.kakao.maps.Marker({
         position: new window.kakao.maps.LatLng(waypoints[0].lat, waypoints[0].lng),
-        map: mapInstance.current,
-        image: blueMarkerImage
+        map: mapInstance.current
       });
 
       const startInfoWindow = new window.kakao.maps.InfoWindow({
@@ -240,12 +234,11 @@ function KakaoMapDisplay({
       startInfoWindow.open(mapInstance.current, startMarker);
       markersRef.current.push(startMarker);
 
-      // Add end marker (파란색 - 도착지)
+      // Add end marker (기본 마커 사용)
       const endPoint = waypoints[waypoints.length - 1];
       const endMarker = new window.kakao.maps.Marker({
         position: new window.kakao.maps.LatLng(endPoint.lat, endPoint.lng),
-        map: mapInstance.current,
-        image: blueMarkerImage
+        map: mapInstance.current
       });
 
       const endInfoWindow = new window.kakao.maps.InfoWindow({
